@@ -1,0 +1,11 @@
+{"type":"FeatureCollection", "features": [
+{"type":"Feature","geometry":{"type":"Point","coordinates":[16813.136957306415,4126408.267723551]},"properties":{"CODE":206,"GB":31060,"RNAME":"托克托县","lx":"旗县"}},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[69529.33066119067,4138435.976294838]},"properties":{"CODE":206,"GB":31060,"RNAME":"和林格尔县","lx":"旗县"}},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[10644.848664328456,4176201.3538885955]},"properties":{"CODE":206,"GB":31060,"RNAME":"土默特左旗","lx":"旗县"}},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[57840.524706002325,4086782.9670414515]},"properties":{"CODE":206,"GB":31060,"RNAME":"清水河县","lx":"旗县"}},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[37264.038228672,4218171.670282079]},"properties":{"CODE":0,"GB":0,"RNAME":"武川县","lx":""}},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[56296.85553268157,4180162.5869767442]},"properties":{"CODE":0,"GB":0,"RNAME":"玉泉区","lx":""}},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[58580.171941133216,4184584.135186758]},"properties":{"CODE":0,"GB":0,"RNAME":"赛罕区","lx":""}},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[51983.029127785936,4186356.6074709445]},"properties":{"CODE":0,"GB":0,"RNAME":"回民区","lx":""}},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[55477.42579376139,4191782.389228655]},"properties":{"CODE":0,"GB":0,"RNAME":"新城区","lx":""}}
+]}
