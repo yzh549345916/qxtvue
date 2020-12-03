@@ -31,6 +31,17 @@ function getTodayHourAndMinute (){
 export{
     getTodayHourAndMinute
 }
+function getZNWGTodayHourAndMinute (){
+    var mydate = new Date();
+    if(mydate.getHours()<= 16){
+        return  "08:00";
+    }else{
+        return  "20:00";
+    }
+}
+export{
+    getZNWGTodayHourAndMinute
+}
 function getTodayHourAndMinuteAndSecond (){
     var mydate = new Date();
     if(mydate.getHours()<=13){
@@ -53,4 +64,16 @@ function getTodayHourAndMinuteTsp (){
 }
 export{
     getTodayHourAndMinuteTsp
+}
+function getZNWGQbTsp (){
+    var mydate = new Date().toISOString().substr(0, 10);
+    var mydate1 = new Date()
+    if(mydate1.getHours()<= 16){
+        return   (new Date((mydate+" "+"08:00:00").substring(0,19).replace(/-/g,'/'))).getTime();
+    }else{
+        return   (new Date((mydate+" "+"20:00:00").substring(0,19).replace(/-/g,'/'))).getTime();
+    }
+}
+export{
+    getZNWGQbTsp
 }

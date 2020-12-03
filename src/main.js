@@ -28,7 +28,6 @@ router.beforeEach((to, from, next) => {
                store.state.user.expiresTime = 0
                 next({
                     path: 'login',
-
                     query: {redirect: to.fullPath}
                 })
             }

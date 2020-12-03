@@ -8,7 +8,7 @@
               scroll-target="#scrolling-techniques"
           >
             <v-toolbar-title  class="text-h4">
-              数值预报查询平台
+              呼和浩特市智能网格预报业务平台
             </v-toolbar-title>
 
             <v-spacer></v-spacer>
@@ -24,6 +24,26 @@
                   首页
                 </v-btn>
               </template>
+            </v-menu>
+            <v-menu auto :offset-y=true open-on-hover  transition="slide-y-transition" >
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                    dark
+                    v-bind="attrs"
+                    v-on="on"
+                    class="text-h5"
+                >
+                  预报服务
+                </v-btn>
+              </template>
+              <v-list
+                  nav
+                  dense
+              >
+                <v-list-item link to="/预报服务/环保局">
+                  <v-list-item-title class="text-body-1">环保局</v-list-item-title>
+                </v-list-item>
+              </v-list>
             </v-menu>
             <v-menu auto :offset-y=true open-on-hover  transition="slide-y-transition" >
               <template v-slot:activator="{ on, attrs }">

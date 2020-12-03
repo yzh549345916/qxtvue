@@ -4,6 +4,7 @@ import Home from "../components/Home";
 import 单站多要素 from "../components/数值预报查询/单站多要素";
 import 多站单要素 from "../components/数值预报查询/多站单要素";
 import 数值预报图表查询 from "../components/数值预报查询/数值预报图表查询";
+import 环保局 from "../components/预报服务/环保局";
 import 主页 from "../components/home/主页";
 import Login from '../components/Login';
 import myMapFirst from '../components/地图/myMapFirst';
@@ -46,6 +47,7 @@ export default new Router({
                     meta: {
                         requireAuth: true
                     },children: [
+                        {path: '/', redirect: '/数值预报查询/数值预报图表查询/地图查询'},
                         {
                             path: "/数值预报查询/数值预报图表查询/单站多要素",
                             name: "单站多要素",
@@ -72,7 +74,14 @@ export default new Router({
                         },
                         ]
                 }
-
+                , {
+                    path: "/预报服务/环保局",
+                    name: "环保局",
+                    component: 环保局,
+                    meta: {
+                        requireAuth: false
+                    }
+                }
 
             ]
         }

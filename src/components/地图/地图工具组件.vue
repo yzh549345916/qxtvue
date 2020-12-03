@@ -1,11 +1,11 @@
 <template>
-  <v-hover id="maptool"  open-delay="200" close-delay="1000"  v-slot:default="{ hover }">
-    <div >
+  <v-hover id="maptool" open-delay="200" close-delay="1000" v-slot:default="{ hover }">
+    <div>
       <v-btn fab color="primary" small elevation=20 v-if="!hover">
         <v-icon class>mdi-toolbox</v-icon>
       </v-btn>
       <v-fab-transition>
-        <div style="min-width: 200px"   v-if="hover">
+        <div style="min-width: 200px" v-if="hover">
           <v-toolbar
               color='#212121e0'
           >
@@ -15,7 +15,9 @@
                     icon
                     v-bind="attrs"
                     v-on="on"
-                >  <v-icon>my_location</v-icon></v-btn>
+                >
+                  <v-icon>my_location</v-icon>
+                </v-btn>
               </template>
               <span>待定1</span>
             </v-tooltip>
@@ -25,14 +27,16 @@
                     icon
                     v-bind="attrs"
                     v-on="on"
-                >  <v-icon>mdi-dots-vertical</v-icon></v-btn>
+                >
+                  <v-icon>mdi-dots-vertical</v-icon>
+                </v-btn>
               </template>
               <span>待定2</span>
             </v-tooltip>
-            <template v-slot:extension >
+            <template v-slot:extension>
               <v-tabs
                   v-model="tcmodel"
-
+                  center-active
                   fixed-tabs
                   slider-color="primary"
               >
@@ -46,11 +50,11 @@
               </v-tabs>
             </template>
           </v-toolbar>
-          <v-tabs-items v-model="tcmodel" >
+          <v-tabs-items v-model="tcmodel">
             <v-tab-item
             >
-              <v-sheet flat >
-                <v-card >
+              <v-sheet flat>
+                <v-card>
                   <v-list>
                     <v-list-group
                         v-for="item in gDitems"
@@ -81,8 +85,8 @@
             </v-tab-item>
             <v-tab-item
             >
-              <v-sheet flat >
-                <v-card >
+              <v-sheet flat>
+                <v-card>
                   <v-list>
                     <v-list-group
                         v-for="item in zDitems"
@@ -123,8 +127,9 @@
 <script>
 export default {
   name: "地图工具组件",
-  data () {
+  data() {
     return {
+      hover:true,
       gdSelectItem: null,
       gDitems: [
         {
@@ -132,7 +137,7 @@ export default {
           active: true,
           title: '区台新方法',
           items: [
-            { title: '气温' },{ title: '10米风' },{ title: '相对湿度' },
+            {title: '气温'}, {title: '10米风'}, {title: '相对湿度'},
           ],
         },
         {
@@ -140,7 +145,7 @@ export default {
           title: 'RMAPS',
           active: false,
           items: [
-            { title: '气温' },{ title: '降水量' },{ title: '10米风' },{ title: '相对湿度' },
+            {title: '气温'}, {title: '降水量'}, {title: '10米风'}, {title: '相对湿度'},
           ],
         },
 
@@ -152,7 +157,7 @@ export default {
           active: true,
           title: '区台新方法',
           items: [
-            { title: '气温' },{ title: '10米风' },{ title: '相对湿度' },
+            {title: '气温'}, {title: '10米风'}, {title: '相对湿度'},
           ],
         },
         {
@@ -160,54 +165,57 @@ export default {
           title: 'RMAPS',
           active: false,
           items: [
-            { title: '气温' },{ title: '降水量' },{ title: '10米风' },{ title: '相对湿度' },
+            {title: '气温'}, {title: '降水量'}, {title: '10米风'}, {title: '相对湿度'},{title: '能见度'},
           ],
         },
 
       ],
       tcmodel: 'tab-2',
       titleItem: [
-        { tab: '格点预报'},
-        { tab: '站点预报'},
-        { tab: '实况'},
-        { tab: '雷达'},
-        { tab: '云图' },
-        { tab: '待定'},
-        { tab: '待定2'},
-        { tab: '待定3'},
+        {tab: '格点预报'},
+        {tab: '站点预报'},
+        {tab: '实况'},
+        {tab: '雷达'},
+        {tab: '云图'},
+        {tab: '待定'},
+        {tab: '待定2'},
+        {tab: '待定3'},
       ],
     }
   },
-  watch:{
-    gdSelectItem(){
-      if(this.gdSelectItem!==null){
-        var s1=this.gDitems;
-        for(let i=0;i<s1.length;i++){
-          if(s1[i].active){
-            alert(s1[i].title+'\n'+this.gdSelectItem+'\n'+this.tcmodel);
+  watch: {
+    gdSelectItem() {
+      if (this.gdSelectItem !== null) {
+        var s1 = this.gDitems;
+        for (let i = 0; i < s1.length; i++) {
+          if (s1[i].active) {
+            //alert(s1[i].title+'\n'+this.gdSelectItem+'\n'+this.tcmodel);
           }
         }
       }
     },
-    zdSelectItem(){
-      if(this.zdSelectItem!==null){
-        var s1=this.zDitems;
-        for(let i=0;i<s1.length;i++){
-          if(s1[i].active){
-            var fasdfa=s1[i].items[this.zdSelectItem];
-            alert(s1[i].title+'\n'+this.zdSelectItem+'\n'+s1[i].items[this.zdSelectItem].title);
-           // this.$emit('tctoolbox-change', this.tcmodel,s1[i].title,this.zdSelectItem);
+    zdSelectItem() {
+      if (this.zdSelectItem !== null) {
+        var s1 = this.zDitems;
+        for (let i = 0; i < s1.length; i++) {
+          if (s1[i].active) {
+            if (s1[i].items[this.zdSelectItem] === undefined) {
+              this.$emit('tctoolbox-change', this.tcmodel, s1[i].title, "取消");
+            } else {
+              this.$emit('tctoolbox-change', this.tcmodel, s1[i].title, s1[i].items[this.zdSelectItem].title);
+            }
+
           }
         }
       }
     },
   },
-  methods:{
-    myclisck(){
-      this.gdSelectItem=null;
+  methods: {
+    myclisck() {
+      this.gdSelectItem = null;
     },
-    myzdclisck(){
-      this.zdSelectItem=null;
+    myzdclisck() {
+      this.zdSelectItem = null;
     },
   },
 
@@ -217,10 +225,10 @@ export default {
 <style scoped>
 #maptool {
   position: absolute;
-  max-width: 30%;
+  max-width: 25%;
   top: 1em;
   left: 5em;
-  z-index:6;
+  z-index: 6;
 
 
 }
