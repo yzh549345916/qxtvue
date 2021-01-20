@@ -25,6 +25,11 @@ let option1 = {
   },
   tooltip: {
     trigger: 'axis',
+    backgroundColor:'rgba(16,13,13,0.6)',
+    borderWidth:0,
+    textStyle:{
+      color:'rgba(255,255,255)',
+    },
   },
   legend: {
     left: '1%',

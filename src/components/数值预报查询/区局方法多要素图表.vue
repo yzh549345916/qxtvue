@@ -16,7 +16,7 @@
 <script>
 
 import Eharts from '@/components/数值预报查询/Echarts多要素组件'
-import echarts from 'echarts'
+import * as echarts from 'echarts'
 
 var directionMap = {};
 
@@ -55,13 +55,19 @@ let option1 = {
   title: {
     text: '新方法单站多要素预报查询',
     subtext: '呼和浩特市气象台',
-    left: 'center'
+    left: 'center',
+    top:'25px'
   },
   tooltip: {
     trigger: 'axis',
+    backgroundColor:'rgba(16,13,13,0.6)',
+    borderWidth:0,
+    textStyle:{
+      color:'rgba(255,255,255)',
+    },
     formatter: function (params) {
 
-      let myStr = '<div style="text-align: center;margin-bottom: 0px">' + echarts.format.formatTime('MM月dd日hh时', params[0].value[0]) + '</div>';
+      let myStr = '<div style="text-align: center;margin-bottom: 0px;">' + echarts.format.formatTime('MM月dd日hh时', params[0].value[0]) + '</div>';
       let btStr='<table border="1" style="min-width: 300px" width="100%"><tr><th width="30%" style="text-align:center;">要素名称</th><th width="20%" style="text-align:center;">预报</th><th width="20%" style="text-align:center;">实况</th><th width="30%" style="text-align:center;">预报-实况</th></tr>';
       let myStr3='';
       myStr3+=btStr;
@@ -122,7 +128,7 @@ let option1 = {
           }
 
         }*/
-        pName =params[i].seriesName.slice(0,-2);
+        //pName =params[i].seriesName.slice(0,-2);
         val=params[i].value[1];
       }
       if(lastsk!==lastyb){
@@ -133,7 +139,8 @@ let option1 = {
 
       myStr3+='</table>';
       return myStr+myStr3;
-    }
+    },
+
   },
   legend: {
     left: '1%',
@@ -505,10 +512,10 @@ export default {
           .get('/getqtzdybAndSkWithoutDataType?id=' + myID + '&times=' + this.myTimeSpan)
           .then(res => {
             option1.title.text = res.data.title;
-            for (let i = 0; i < option1.series.length; i++) {
-              option1.series[i].name = "";
-              option1.series[i].data = [];
+            for(let i=0;i<=10;i++){
+              option1.series[i].data = null;
             }
+
             let arr = res.data.temYbValue;
             if (arr === null || arr.length == 0) {
               option1.title.text = "暂无数据";
@@ -560,10 +567,12 @@ export default {
             option1.series[4].data = arr;
             option1.series[4].name = res.data.tminYbName;
             if (res.data.tminSkValue !== undefined && res.data.tminSkValue != null) {
-              let arr1 = res.data.tminSkValue;
+              let arr1 = res.data.tminSkValue.filter(function(item) {
+                return (item[1] < 99991&&item[1] >-99991);
+              });
               for (let i = 0; i < arr1.length; i++) {
                 if (arr1[i][1] >= 99991 || arr1[i][1] <= -99991) {
-                  arr1[i][1] = null;
+                  arr1[i][1] = 1;
                 }
               }
               option1.series[5].data = arr1;

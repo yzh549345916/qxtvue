@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import Echarts from 'echarts'
+import * as Echarts from 'echarts'
 import '../../assets/js/eChartsTheme/yzhBlack'
 export default {
   data() {
@@ -64,7 +64,13 @@ export default {
       this.chart = Echarts.init(this.$refs.chartEl,'yzhBlack');
     },
     setOption(option){
-      this.chart && this.chart.setOption(option,true);
+
+      setTimeout(() => {
+        try {
+
+          this.chart && this.chart.setOption(option,true);
+        } catch (error) { console.log(error);}
+      }, 500)
       //可以设置重新加载动画
      /* this.chart.clear();
       this.chart.setOption(option,true);*/

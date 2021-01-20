@@ -31,7 +31,7 @@
 <script>
 
 import Eharts from '@/components/数值预报查询/Echarts基组件'
-import echarts from "echarts";
+import * as echarts from 'echarts'
 var directionMap = {};
 function renderArrow(param, api) {
   var arrowSize = 21;
@@ -66,7 +66,8 @@ let option1 = {
   title: {
     text: '大气污染条件联合会商—温度',
     subtext: '呼和浩特市气象台',
-    left: 'center'
+    left: 'center',
+    top:'25px'
   },
   tooltip: {
     trigger: 'axis',
@@ -136,7 +137,8 @@ let option2 = {
   title: {
     text: '大气污染条件联合会商—相对湿度',
     subtext: '呼和浩特市气象台',
-    left: 'center'
+    left: 'center',
+    top:'25px'
   },
   tooltip: {
     trigger: 'axis',
@@ -206,7 +208,8 @@ let option3 = {
   title: {
     text: '大气污染条件联合会商—能见度',
     subtext: '呼和浩特市气象台',
-    left: 'center'
+    left: 'center',
+    top:'25px'
   },
   tooltip: {
     trigger: 'axis',
@@ -276,7 +279,8 @@ let option4 = {
   title: {
     text: '大气污染条件联合会商—降水量',
     subtext: '呼和浩特市气象台',
-    left: 'center'
+    left: 'center',
+    top:'25px'
   },
   tooltip: {
     trigger: 'axis',
@@ -346,7 +350,8 @@ let option5 = {
   title: {
     text: '大气污染条件联合会商—风',
     subtext: '呼和浩特市气象台',
-    left: 'center'
+    left: 'center',
+    top:'25px'
   },
   tooltip: {
     trigger: 'axis',
