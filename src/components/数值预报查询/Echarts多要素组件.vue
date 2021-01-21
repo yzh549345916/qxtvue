@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import Echarts from 'echarts'
+import * as Echarts from 'echarts'
 import '../../assets/js/eChartsTheme/yzhBlack'
 export default {
   data() {
@@ -63,8 +63,32 @@ export default {
     loadEchart() {
       this.chart = Echarts.init(this.$refs.chartEl,'yzhBlack');
     },
+    showload() {
+      this.chart.showLoading({
+        text: '正在加载数据' ,
+        textColor: '#000',
+        maskColor: 'rgba(227,239,248,0.6)',
+        // 字体大小。从 `v4.8.0` 开始支持。
+        fontSize: 50,
+        // 是否显示旋转动画（spinner）。从 `v4.8.0` 开始支持。
+        showSpinner: true,
+        // 旋转动画（spinner）的半径。从 `v4.8.0` 开始支持。
+        spinnerRadius: 50,
+        // 旋转动画（spinner）的线宽。从 `v4.8.0` 开始支持。
+        lineWidth: 5
+      });
+    },
+    hideload() {
+      this.chart.hideLoading();
+    },
     setOption(option){
-      this.chart && this.chart.setOption(option,true);
+
+      setTimeout(() => {
+        try {
+
+          this.chart && this.chart.setOption(option,true);
+        } catch (error) { console.log(error);}
+      }, 500)
       //可以设置重新加载动画
      /* this.chart.clear();
       this.chart.setOption(option,true);*/

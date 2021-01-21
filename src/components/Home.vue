@@ -18,7 +18,7 @@
                     dark
                     v-bind="attrs"
                     v-on="on"
-                    to="/主页"
+                    router-link :to="encodeURI('/主页')"
                     class="text-h5"
                 >
                   首页
@@ -40,7 +40,7 @@
                   nav
                   dense
               >
-                <v-list-item link to="/预报服务/环保局">
+                <v-list-item router-link :to="encodeURI('/预报服务/环保局')">
                   <v-list-item-title class="text-body-1">环保局</v-list-item-title>
                 </v-list-item>
               </v-list>
@@ -63,7 +63,7 @@
                <!-- <v-list-item link to="/数值预报查询/Chart1">
                   <v-list-item-title class="text-body-1">折线图</v-list-item-title>
                 </v-list-item>-->
-                <v-list-item link to="/数值预报查询/数值预报图表查询">
+                <v-list-item  router-link :to="encodeURI('/数值预报查询/数值预报图表查询')">
                   <v-list-item-title class="text-body-1">图表查询</v-list-item-title>
                 </v-list-item>
               </v-list>

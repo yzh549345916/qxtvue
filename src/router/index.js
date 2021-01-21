@@ -31,9 +31,9 @@ export default new Router({
                 requireAuth: true
             }
             , children: [
-                {path: '/', redirect: '/数值预报查询/数值预报图表查询/地图查询'},
+                {path: '/', redirect: encodeURI('/数值预报查询/数值预报图表查询/地图查询')},
                 {
-                    path: "/主页",
+                    path: encodeURI("/主页"),
                     name: "主页",
                     component: 主页,
                     meta: {
@@ -41,15 +41,15 @@ export default new Router({
                     }
                 }
                 , {
-                    path: "/数值预报查询/数值预报图表查询",
+                    path: encodeURI("/数值预报查询/数值预报图表查询"),
                     name: "数值预报图表查询",
                     component: 数值预报图表查询,
                     meta: {
                         requireAuth: true
                     },children: [
-                        {path: '/', redirect: '/数值预报查询/数值预报图表查询/地图查询'},
+                        {path: '/', redirect: encodeURI('/数值预报查询/数值预报图表查询/地图查询')},
                         {
-                            path: "/数值预报查询/数值预报图表查询/单站多要素",
+                            path: encodeURI("/数值预报查询/数值预报图表查询/单站多要素"),
                             name: "单站多要素",
                             component: 单站多要素,
                             meta: {
@@ -57,7 +57,7 @@ export default new Router({
                             }
                         },
                         {
-                            path: "/数值预报查询/数值预报图表查询/多站单要素",
+                            path: encodeURI("/数值预报查询/数值预报图表查询/多站单要素"),
                             name: "多站单要素",
                             component: 多站单要素,
                             meta: {
@@ -65,7 +65,7 @@ export default new Router({
                             }
                         },
                         {
-                            path: "/数值预报查询/数值预报图表查询/地图查询",
+                            path: encodeURI("/数值预报查询/数值预报图表查询/地图查询"),
                             name: "地图查询",
                             component: myMapFirst,
                             meta: {
@@ -75,7 +75,7 @@ export default new Router({
                         ]
                 }
                 , {
-                    path: "/预报服务/环保局",
+                    path: encodeURI("/预报服务/环保局"),
                     name: "环保局",
                     component: 环保局,
                     meta: {

@@ -16,7 +16,7 @@
 <script>
 
 import Eharts from '@/components/数值预报查询/Echarts多要素组件'
-import echarts from 'echarts'
+import * as echarts from 'echarts'
 
 var directionMap = {};
 
@@ -55,13 +55,19 @@ let option1 = {
   title: {
     text: '新方法单站多要素预报查询',
     subtext: '呼和浩特市气象台',
-    left: 'center'
+    left: 'center',
+    top:'25px'
   },
   tooltip: {
     trigger: 'axis',
+    backgroundColor:'rgba(16,13,13,0.6)',
+    borderWidth:0,
+    textStyle:{
+      color:'rgba(255,255,255)',
+    },
     formatter: function (params) {
 
-      let myStr = '<div style="text-align: center;margin-bottom: 0px">' + echarts.format.formatTime('MM月dd日hh时', params[0].value[0]) + '</div>';
+      let myStr = '<div style="text-align: center;margin-bottom: 0px;">' + echarts.format.formatTime('MM月dd日hh时', params[0].value[0]) + '</div>';
       let btStr='<table border="1" style="min-width: 300px" width="100%"><tr><th width="30%" style="text-align:center;">要素名称</th><th width="20%" style="text-align:center;">预报</th><th width="20%" style="text-align:center;">实况</th><th width="30%" style="text-align:center;">预报-实况</th></tr>';
       let myStr3='';
       myStr3+=btStr;
@@ -122,7 +128,7 @@ let option1 = {
           }
 
         }*/
-        pName =params[i].seriesName.slice(0,-2);
+        //pName =params[i].seriesName.slice(0,-2);
         val=params[i].value[1];
       }
       if(lastsk!==lastyb){
@@ -133,7 +139,8 @@ let option1 = {
 
       myStr3+='</table>';
       return myStr+myStr3;
-    }
+    },
+
   },
   legend: {
     left: '1%',
@@ -501,15 +508,18 @@ export default {
       }
     },
     dqszyb: function (myID) {
+      this.$refs.chart1.showload();
       this.$axios
           .get('/getqtzdybAndSkWithoutDataType?id=' + myID + '&times=' + this.myTimeSpan)
           .then(res => {
             option1.title.text = res.data.title;
-            for (let i = 0; i < option1.series.length; i++) {
-              option1.series[i].name = "";
-              option1.series[i].data = [];
+            for(let i=0;i<=10;i++){
+              option1.series[i].data = null;
             }
-            let arr = res.data.temYbValue;
+
+            let arr = res.data.temYbValue.filter(function(item) {
+              return (item[1] < 99991&&item[1] >-99991);
+            });
             if (arr === null || arr.length == 0) {
               option1.title.text = "暂无数据";
             } else {
@@ -522,17 +532,21 @@ export default {
             option1.series[0].data = arr;
             option1.series[0].name = res.data.temYbName;
             if (res.data.temSkValue !== undefined && res.data.temSkValue != null) {
-              let arr1 = res.data.temSkValue;
+              let arr1 = res.data.temSkValue.filter(function(item) {
+                return (item[1] < 99991&&item[1] >-99991);
+              });
               for (let i = 0; i < arr1.length; i++) {
                 if (arr1[i][1] >= 99991 || arr1[i][1] <= -99991) {
-                  arr1[i][1] = undefined;
+                  arr1[i][1] = null;
                 }
               }
               option1.series[1].data = arr1;
               option1.series[1].name = res.data.temSkName;
             }
 
-            arr = res.data.tmaxYbValue;
+            arr = res.data.tmaxYbValue.filter(function(item) {
+              return (item[1] < 99991&&item[1] >-99991);
+            });
             for (let i = 0; i < arr.length; i++) {
               if (arr[i][1] < -9999 || arr[i][1] > 9999) {
                 arr[i][1] = null;
@@ -541,7 +555,9 @@ export default {
             option1.series[2].data = arr;
             option1.series[2].name = res.data.tmaxYbName;
             if (res.data.tmaxSkValue !== undefined && res.data.tmaxSkValue != null) {
-              let arr1 = res.data.tmaxSkValue;
+              let arr1 = res.data.tmaxSkValue.filter(function(item) {
+                return (item[1] < 99991&&item[1] >-99991);
+              });
               for (let i = 0; i < arr1.length; i++) {
                 if (arr1[i][1] >= 99991 || arr1[i][1] <= -99991) {
                   arr1[i][1] = null;
@@ -551,7 +567,9 @@ export default {
               option1.series[3].name = res.data.tmaxSkName;
             }
 
-            arr = res.data.tminYbValue;
+            arr = res.data.tminYbValue.filter(function(item) {
+              return (item[1] < 99991&&item[1] >-99991);
+            });
             for (let i = 0; i < arr.length; i++) {
               if (arr[i][1] < -9999 || arr[i][1] > 9999) {
                 arr[i][1] = null;
@@ -560,17 +578,21 @@ export default {
             option1.series[4].data = arr;
             option1.series[4].name = res.data.tminYbName;
             if (res.data.tminSkValue !== undefined && res.data.tminSkValue != null) {
-              let arr1 = res.data.tminSkValue;
+              let arr1 = res.data.tminSkValue.filter(function(item) {
+                return (item[1] < 99991&&item[1] >-99991);
+              });
               for (let i = 0; i < arr1.length; i++) {
                 if (arr1[i][1] >= 99991 || arr1[i][1] <= -99991) {
-                  arr1[i][1] = null;
+                  arr1[i][1] = 1;
                 }
               }
               option1.series[5].data = arr1;
               option1.series[5].name = res.data.tminSkName;
             }
 
-            arr = res.data.rhuybValue;
+            arr = res.data.rhuybValue.filter(function(item) {
+              return (item[1] < 99991&&item[1] >-99991);
+            });
             for (let i = 0; i < arr.length; i++) {
               if (arr[i][1] < -9999 || arr[i][1] > 9999) {
                 arr[i][1] = null;
@@ -579,7 +601,9 @@ export default {
             option1.series[6].data = arr;
             option1.series[6].name = res.data.rhuybName;
             if (res.data.rhuskValue !== undefined && res.data.rhuskValue != null) {
-              let arr1 = res.data.rhuskValue;
+              let arr1 = res.data.rhuskValue.filter(function(item) {
+                return (item[1] < 99991&&item[1] >-99991);
+              });
               for (let i = 0; i < arr1.length; i++) {
                 if (arr1[i][1] >= 99991 || arr1[i][1] <= -99991) {
                   arr1[i][1] = null;
@@ -589,7 +613,9 @@ export default {
               option1.series[7].name = res.data.rhuskName;
             }
 
-            arr = res.data.wind2YbValue;
+            arr = res.data.wind2YbValue.filter(function(item) {
+              return (item[1] < 99991&&item[1] >-99991);
+            });
             for (let i = 0; i < arr.length; i++) {
               if (arr[i][1] < -9999 || arr[i][1] > 9999) {
                 arr[i][1] = null;
@@ -601,7 +627,9 @@ export default {
             option1.series[9].data = arr;
             option1.series[9].name = "10米风速预报";
             if (res.data.wind1SkValue !== undefined && res.data.wind1SkValue != null) {
-              let arr1 = res.data.wind1SkValue;
+              let arr1 = res.data.wind1SkValue.filter(function(item) {
+                return (item[1] < 99991&&item[1] >-99991);
+              });
               for (let i = 0; i < arr1.length; i++) {
                 if (arr1[i][1] >= 99991 || arr1[i][1] <= -99991) {
                   arr1[i][1] = null;
@@ -612,10 +640,12 @@ export default {
             }
 
             this.$refs.chart1.setOption(option1);
+            this.$refs.chart1.hideload();
             this.loading = false;
           })
           .catch(err => {
             console.log(err);
+            this.$refs.chart1.hideload();
             this.loading = false;
           });
     }

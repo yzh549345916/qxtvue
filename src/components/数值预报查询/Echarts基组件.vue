@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import Echarts from 'echarts'
+import * as Echarts from 'echarts'
 import '../../assets/js/eChartsTheme/yzhBlack'
 export default {
   data() {

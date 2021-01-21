@@ -10,6 +10,8 @@ Vue.prototype.$echarts = echarts;
 import App from './App.vue'
 import router from "./router"
 Vue.use(Vuetify)
+
+Vue.use(router);
 //kendo.culture("zh-CN")
 // 设置反向代理，前端请求默认发送到http://localhost:3691/api  http://172.18.142.203:3691/api
 var axios = require('axios')
