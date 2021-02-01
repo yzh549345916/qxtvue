@@ -1,10 +1,10 @@
-<script src="../../assets/js/baidumap.js"></script>
 <template>
   <v-sheet style="height: 100%;" color="transparent" class="overflow-x-auto">
 
     <div class="maps" id="map" style="width:100%;height:98%;z-index:5;">
       <maptool @tctoolbox-change='tcToolboxControlChange' v-drag></maptool>
       <mapQbTimeControl v-drag @datetime-change='mapQbTimeControlChange' :lx-type="lxType" :yb-type="stationYbDataType" :data-type="stationYbType"></mapQbTimeControl>
+      <mapStationTool @stationType-change=stationTypeChange @stationDQ-change=stationDQChange   v-drag v-if="stationBs"></mapStationTool>
     </div>
     <!-- 弹窗元素 -->
     <div
@@ -21,11 +21,8 @@
         <div v-html="currentCoordinate"></div>
       </v-chip>
     </div>
-
   </v-sheet>
-
 </template>
-
 <script>
 import "@/assets/styles/ol.css";
 import "@/assets/styles/ol-layerswitcher.css";
@@ -47,6 +44,7 @@ import {Circle as CircleStyle, Fill, Stroke, Icon, Style, Text} from 'ol/style';
 import {XYZ, Vector, ImageWMS, Cluster} from "ol/source";
 import maptool from "@/components/地图/地图工具组件"
 import mapQbTimeControl from '@/components/基础组件/地图起报时间组件'
+import mapStationTool from "@/components/地图/地图站点选择"
 import LayerSwitcher from "ol-layerswitcher";
 import projzh from "@/assets/js/mypro";
 
@@ -65,7 +63,8 @@ export default {
       stationlevelType:0,
       stationlevel:0,
       stationYbStationTye: "国家站,区域站",
-      stationYbDq: 1501
+      stationYbDq: 1501,
+      stationBs:true
     };
   },
   mounted() {
@@ -839,8 +838,17 @@ export default {
       this.stationYbSc = ScSelectValue;
       this.displayStationYb();
     },
+    stationTypeChange: function (stationTypeString) {
+     this.stationYbStationTye=stationTypeString;
+      this.displayStationYb();
+    },
+    stationDQChange: function (stationDQString) {
+      this.stationYbDq=stationDQString;
+      this.displayStationYb();
+    },
     tcToolboxControlChange: function (tabSelect, ybType, dataType) {
       if (tabSelect === 1) {
+        this.stationBs=true;
         this.lxType="站点预报";
         if (dataType === "气温") {
           this.stationYbDataType = 0;
@@ -859,14 +867,15 @@ export default {
       }
       else if(tabSelect===0){
         this.lxType="格点预报";
-
+        this.stationBs=false;
       }
       this.displayStationYb();
     },
   },
   components: {
     maptool,
-    mapQbTimeControl
+    mapQbTimeControl,
+    mapStationTool
   }
 }
 </script>

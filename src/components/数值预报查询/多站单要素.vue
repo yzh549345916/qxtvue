@@ -140,7 +140,7 @@ export default {
       StationType:"国家站",
       Admin_Code:"1501",
       Admin_CodeName:"呼和浩特市",
-      Admin_Code2:[],
+      Admin_Code2: [{"name": "呼和浩特市","id": "1501",}],
       myStations:[],
       myTimeSpan: getTodayHourAndMinuteTsp(),
       stationValue: "",
