@@ -11,15 +11,26 @@
         class="popup1"
         ref="popup1"
         v-show="currentCoordinate !==null"
+
     >
       <v-chip
+
           @click:close="closePopup"
+          close
       >
         <v-avatar left>
           <v-icon color="primary">mdi-artstation</v-icon>
         </v-avatar>
         <div v-html="currentCoordinate"></div>
       </v-chip>
+    </div>
+    <!-- 点击弹窗元素 -->
+    <div
+        class="popupClick"
+        ref="popupClick"
+        v-show="currentCoordinateClick !==null"
+    >
+      <StationDetails :stationYbQbTimespan="stationYbQbTimespan" :lx-type="lxType" :StationID="SelectStationID" :yb-type="stationYbDataType" :data-type="stationYbType"></StationDetails>
     </div>
   </v-sheet>
 </template>
@@ -45,6 +56,7 @@ import {XYZ, Vector, ImageWMS, Cluster} from "ol/source";
 import maptool from "@/components/地图/地图工具组件"
 import mapQbTimeControl from '@/components/基础组件/地图起报时间组件'
 import mapStationTool from "@/components/地图/地图站点选择"
+import StationDetails from "@/components/地图/StationDetails"
 import LayerSwitcher from "ol-layerswitcher";
 import projzh from "@/assets/js/mypro";
 
@@ -54,17 +66,20 @@ export default {
     return {
       map: {},
       currentCoordinate: null, // 弹窗坐标数据
+      currentCoordinateClick: null, // 弹窗坐标数据
       overlay: null,
+      overlayClick: null,
       stationYbQbTimespan: 1599220800000,
       stationYbSc: 9,
-      stationYbType: "区台新方法",
+      stationYbType: "RMAPS",
       lxType:"站点预报",
       stationYbDataType: 0,
       stationlevelType:0,
       stationlevel:0,
       stationYbStationTye: "国家站,区域站",
       stationYbDq: 1501,
-      stationBs:true
+      stationBs:true,
+      SelectStationID:null
     };
   },
   mounted() {
@@ -538,11 +553,24 @@ export default {
       this.overlay = new Overlay({
         element: this.$refs.popup1, // 弹窗标签，在html里
         autoPan: false, // true如果弹窗在底图边缘时，底图会移动
+        stopEvent:false,//特别重要！！！！！默认值为true，如果为true，则触发移动鼠标事件时候无法触发点击事件
         autoPanAnimation: { // 底图移动动画
-          duration: 250
+          duration: 250,
+
         }
       })
+      this.overlayClick = new Overlay({
+        element: this.$refs.popupClick, // 弹窗标签，在html里
+        autoPan: false, // true如果弹窗在底图边缘时，底图会移动
+        stopEvent:true,
+        autoPanAnimation: { // 底图移动动画
+          duration: 250,
+        }
+      })
+      this.map.addOverlay(this.overlayClick)
       this.map.addOverlay(this.overlay)
+      this.map.on('singleclick', this.showClickInfo);
+      this.map.on('pointermove', this.showInfo);
     },
     addPoint() {
 
@@ -686,7 +714,9 @@ export default {
                     name: this.lxType+'-'+this.stationYbType+'-'+this.stationYbDataType+'-'+"图层"
                   });
                   this.map.addLayer(layer);
-                  this.map.on('pointermove', this.showInfo);
+                  //this.map.on('pointermove', this.showInfo);
+
+
                 } else if (this.stationYbDataType === 4) {
                   styleFunction2 = function (feature) {
                     var myfetures = feature.get('features');
@@ -754,7 +784,7 @@ export default {
                     name: this.lxType+'-'+this.stationYbType+'-'+this.stationYbDataType+'-'+"图层"
                   });
                   this.map.addLayer(layer);
-                  this.map.on('pointermove', this.showInfo);
+
                 }
               })
               .catch(err => {
@@ -826,11 +856,76 @@ export default {
 
       this.overlay.setPosition(coordinate)
     },
+    showClickInfo(event) {
+      var features = this.map.getFeaturesAtPixel(event.pixel, {hitTolerance: 1});
+      if (features.length == 0) {
+        this.closeClickPopup();
+        return;
+      }
+      var myfetures = features[0].getProperties().features;
+      var myfeture = myfetures[0];
+      let minlevl = myfeture.get('stationLevel');
+      for (let i = 0; i < myfetures.length; i++) {
+        if (myfetures[i].get('stationLevel') < minlevl) {
+          myfeture = myfetures[i];
+          minlevl = myfeture.get('stationLevel');
+        }
+      }
+      const coordinate = event.coordinate // 获取坐标
+      this.SelectStationID= myfeture.get('id');
+      if(this.stationYbDataType !== 4){
+        this.currentCoordinateClick = myfeture.get('id') + "&nbsp;&nbsp;" + myfeture.get('name') + "&nbsp;&nbsp;" + myfeture.get('ybvalue') + myfeture.get('ybUnit')// 保存坐标点
+      }else{
+        var fxNum=Math.round(myfeture.get('ybvalue2')*180/Math.PI/45);
+        var fxStr="";
+        switch (fxNum){
+          case 0:
+            fxStr = "北风";
+            break;
+          case 1:
+            fxStr = "东北风";
+            break;
+          case 2:
+            fxStr = "东风";
+            break;
+          case 3:
+            fxStr = "东南风";
+            break;
+          case 4:
+            fxStr = "南风";
+            break;
+          case 5:
+            fxStr = "西南风";
+            break;
+          case 6:
+            fxStr = "西风";
+            break;
+          case 7:
+            fxStr = "西北风";
+            break;
+          case 999017:
+            fxStr = "静风";
+            break;
+          default:
+            fxStr = "北风";
+            break;
+        }
+        this.currentCoordinateClick = myfeture.get('id') + "&nbsp;&nbsp;" + myfeture.get('name') + "&nbsp;&nbsp;" + myfeture.get('ybvalue') + myfeture.get('ybUnit')+ "&nbsp;&nbsp;" +fxStr// 保存坐标点
+      }
+
+      this.overlayClick.setPosition(coordinate)
+    },
     // 关闭弹窗
     closePopup() {
       // 把弹窗位置设置为undefined，并清空坐标数据
       this.overlay.setPosition(undefined)
       this.currentCoordinate = null
+    },
+    // 关闭弹窗
+    closeClickPopup() {
+      // 把弹窗位置设置为undefined，并清空坐标数据
+      this.overlayClick.setPosition(undefined)
+      this.currentCoordinateClick = null
     },
 
     mapQbTimeControlChange: function (qbTimeSpan, ScSelectValue) {
@@ -875,7 +970,8 @@ export default {
   components: {
     maptool,
     mapQbTimeControl,
-    mapStationTool
+    mapStationTool,
+    StationDetails
   }
 }
 </script>
@@ -883,6 +979,13 @@ export default {
 <style lang="scss" scoped>
 /* 弹窗样式 */
 .popup1 {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  transform: translate(-50%, calc(-100% - 12px));
+
+}
+.popupClick {
   position: relative;
   display: flex;
   flex-direction: column;

@@ -43,7 +43,6 @@
                 <v-tab
                     v-for="item in titleItem"
                     :key="item.tab"
-
                 >
                   {{ item.tab }}
                 </v-tab>
@@ -150,11 +149,11 @@ export default {
         },
 
       ],
-      zdSelectItem: null,
+      zdSelectItem: 0,
       zDitems: [
         {
           action: 'mdi-new-box',
-          active: true,
+          active: false,
           title: '区台新方法',
           items: [
             {title: '气温'}, {title: '10米风'}, {title: '相对湿度'},
@@ -163,14 +162,14 @@ export default {
         {
           action: 'mdi-alpha-r-box',
           title: 'RMAPS',
-          active: false,
+          active: true,
           items: [
             {title: '气温'}, {title: '降水量'}, {title: '10米风'}, {title: '相对湿度'},{title: '能见度'},
           ],
         },
 
       ],
-      tcmodel: 'tab-2',
+      tcmodel: 1,
       titleItem: [
         {tab: '格点预报'},
         {tab: '站点预报'},
