@@ -1,133 +1,64 @@
 <template>
-  <v-card  >
+  <v-card style="min-width: 500px">
     <v-card-title>
-      <v-avatar left>
-        <v-icon color="primary">mdi-artstation</v-icon>
-      </v-avatar>
-      <v-text-field
-          v-model="search"
-          append-icon="mdi-magnify"
-          label="Search"
-          single-line
-          hide-details
-      ></v-text-field>
+      <v-row dense justify="center">
+        <v-col cols="1" align-self="center">
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                  color="primary"
+                  elevation=20
+                  fab
+                  small
+                  v-bind="attrs"
+                  v-on="on"
+              >
+                <v-icon class>mdi-artstation</v-icon>
+              </v-btn>
+            </template>
+            <span>复制</span>
+          </v-tooltip>
+        </v-col>
+        <v-spacer></v-spacer>
+        <v-col cols="6"  align-self="center">
+          <v-text-field
+              v-model="search"
+              append-icon="mdi-magnify"
+              label="搜索"
+              single-line
+              hide-details
+          ></v-text-field>
+        </v-col>
+        <v-spacer></v-spacer>
+      </v-row>
     </v-card-title>
     <v-data-table
+        class="tag-read"
         :headers="headers"
         :items="desserts"
         :search="search"
+        :footer-props="{
+      itemsPerPageAllText:'所有',
+    }"
     ></v-data-table>
 
-    <!--        <div v-html="currentCoordinateClick"></div>-->
   </v-card>
 </template>
 
 <script>
+
 export default {
   name: "StationDetails",
   data () {
     return {
       search: '',
-      headers: [
-        {
-          text: 'Dessert (100g serving)',
-          align: 'start',
-          filterable: false,
-          value: 'name',
-        },
-        { text: 'Calories', value: 'calories' },
-        { text: 'Fat (g)', value: 'fat' },
-        { text: 'Carbs (g)', value: 'carbs' },
-        { text: 'Protein (g)', value: 'protein' },
-        { text: 'Iron (%)', value: 'iron' },
-      ],
-      desserts: [
-        {
-          name: 'Frozen Yogurt',
-          calories: 159,
-          fat: 6.0,
-          carbs: 24,
-          protein: 4.0,
-          iron: '1%',
-        },
-        {
-          name: 'Ice cream sandwich',
-          calories: 237,
-          fat: 9.0,
-          carbs: 37,
-          protein: 4.3,
-          iron: '1%',
-        },
-        {
-          name: 'Eclair',
-          calories: 262,
-          fat: 16.0,
-          carbs: 23,
-          protein: 6.0,
-          iron: '7%',
-        },
-        {
-          name: 'Cupcake',
-          calories: 305,
-          fat: 3.7,
-          carbs: 67,
-          protein: 4.3,
-          iron: '8%',
-        },
-        {
-          name: 'Gingerbread',
-          calories: 356,
-          fat: 16.0,
-          carbs: 49,
-          protein: 3.9,
-          iron: '16%',
-        },
-        {
-          name: 'Jelly bean',
-          calories: 375,
-          fat: 0.0,
-          carbs: 94,
-          protein: 0.0,
-          iron: '0%',
-        },
-        {
-          name: 'Lollipop',
-          calories: 392,
-          fat: 0.2,
-          carbs: 98,
-          protein: 0,
-          iron: '2%',
-        },
-        {
-          name: 'Honeycomb',
-          calories: 408,
-          fat: 3.2,
-          carbs: 87,
-          protein: 6.5,
-          iron: '45%',
-        },
-        {
-          name: 'Donut',
-          calories: 452,
-          fat: 25.0,
-          carbs: 51,
-          protein: 4.9,
-          iron: '22%',
-        },
-        {
-          name: 'KitKat',
-          calories: 518,
-          fat: 26.0,
-          carbs: 65,
-          protein: 7,
-          iron: '6%',
-        },
-      ],
+      headers: [],
+      desserts: [],
     }
   },
   props: {
     dataType: {
-      type: String,
+      type: Number,
       required: true
     },
     StationID: {
@@ -135,14 +66,18 @@ export default {
       required: true
     },
     ybType: {
-      type: Number,
-      required: true
-    },
-    lxType: {
       type: String,
       required: true
     },
     stationYbQbTimespan:{
+      type: Number,
+      required: true
+    },
+    stationlevelType:{
+      type: Number,
+      required: true
+    },
+    stationlevel:{
       type: Number,
       required: true
     }
@@ -150,10 +85,52 @@ export default {
   methods: {
     csh() {
       if(this.StationID!=null){
-        alert(this.dataType+"\r\n"+this.StationID+"\r\n"+this.ybType+"\r\n"+this.lxType+"\r\n"+this.lxType);
+
+        /*this.headers=[
+          {
+            align: 'start',
+            filterable: false,
+            value: 'name',
+            "text":"温度预报"
+          },
+          { text: 'Calories',align: 'center', value: 'calories' },
+          { text: 'Fat (g)',align: 'center', value: 'fat' },
+          { text: 'Carbs (g)',align: 'center', value: 'carbs' },
+          { text: 'Protein (g)',align: 'center', value: 'protein' },
+          { text: 'Iron (%)',align: 'center', value: 'iron' },
+        ];
+        alert(this.dataType+"\r\n"+this.StationID+"\r\n"+this.ybType+"\r\n"+this.lxType+"\r\n"+this.lxType);*/
       }
 
     },
+    copyLink() {
+      let _this = this;
+      let clipboard = new this.clipboard(".cobyOrderSn");
+      clipboard.on('success', function () {
+        _this.$toast("复制成功")
+      });
+      clipboard.on('error', function () {
+        _this.$toast("复制失败")
+      });
+    },
+    copyText(str) {
+      // 判断是否为ie浏览器，此方法只对IE浏览器有用
+      if (window.clipboardData) {
+        // 清除原有剪切板的数据
+        window.clipboardData.clearData();
+        // 将内容复制到剪切板
+        window.clipboardData.setData("Text", str);
+        // 其它浏览器,用别的方法
+      } else {
+        const el = document.createElement("textarea");
+        el.addEventListener("focusin", (e) => e.stopPropagation());
+        el.value = str;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand("copy");
+        document.body.removeChild(el);
+      }
+    }
 
   },
   mounted() {
@@ -162,11 +139,25 @@ export default {
   watch: {
     StationID() {
       if (this.StationID !== null) {
-        alert(this.dataType+"\r\n"+this.StationID+"\r\n"+this.ybType+"\r\n"+this.lxType+"\r\n"+this.lxType);
+        var myurl="";
+        myurl='/getzdybByTypeStationsQBTime?YBType=' + this.ybType + '&DataTypeID=' + this.dataType + '&StationID=' + this.StationID + '&times=' + this.stationYbQbTimespan+ '&stationlevelType=' + this.stationlevelType+ '&stationlevel=' + this.stationlevel;
+        this.$axios
+            .get(myurl)
+            .then(res => {
+              this.headers=res.data.headers;
+              this.desserts=res.data.datas;
+            })
+            .catch(err => {
+              console.log(err);
+            });
       }
     },
 
   },
+  components: {
+
+  }
+
 }
 </script>
 

@@ -30,7 +30,7 @@
         ref="popupClick"
         v-show="currentCoordinateClick !==null"
     >
-      <StationDetails :stationYbQbTimespan="stationYbQbTimespan" :lx-type="lxType" :StationID="SelectStationID" :yb-type="stationYbDataType" :data-type="stationYbType"></StationDetails>
+      <StationDetails :stationYbQbTimespan="stationYbQbTimespan"  :StationID="SelectStationID" :stationlevel="stationlevel" :stationlevelType="stationlevelType" :yb-type="stationYbType" :data-type="stationYbDataType"></StationDetails>
     </div>
   </v-sheet>
 </template>
@@ -561,11 +561,9 @@ export default {
       })
       this.overlayClick = new Overlay({
         element: this.$refs.popupClick, // 弹窗标签，在html里
-        autoPan: false, // true如果弹窗在底图边缘时，底图会移动
+        autoPan: true, // true如果弹窗在底图边缘时，底图会移动
         stopEvent:true,
-        autoPanAnimation: { // 底图移动动画
-          duration: 250,
-        }
+        autoPanMargin:100
       })
       this.map.addOverlay(this.overlayClick)
       this.map.addOverlay(this.overlay)
@@ -979,17 +977,15 @@ export default {
 <style lang="scss" scoped>
 /* 弹窗样式 */
 .popup1 {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  transform: translate(-50%, calc(-100% - 12px));
+  position: absolute;
+  bottom: 12px;
+  left: -50px;
 
 }
 .popupClick {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  transform: translate(-50%, calc(-100% - 12px));
+  position: absolute;
+  bottom: 12px;
+
 }
 
 </style>
