@@ -1,11 +1,12 @@
 <template>
+
   <v-hover id="maptool" open-delay="200" close-delay="1000" v-slot:default="{ hover }">
     <div>
       <v-btn fab color="primary" small elevation=20 v-if="!hover">
         <v-icon class>mdi-toolbox</v-icon>
       </v-btn>
       <v-fab-transition>
-        <div style="min-width: 200px" v-if="hover">
+        <div style="min-width: 200px;" v-if="hover">
           <v-toolbar
               color='#212121e0'
           >
@@ -49,11 +50,11 @@
               </v-tabs>
             </template>
           </v-toolbar>
-          <v-tabs-items v-model="tcmodel">
+          <v-tabs-items style="max-height: 400px" class="overflow-y-auto" v-model="tcmodel">
             <v-tab-item
             >
-              <v-sheet flat>
-                <v-card>
+              <v-card >
+              <v-sheet>
                   <v-list>
                     <v-list-group
                         v-for="item in gDitems"
@@ -79,8 +80,9 @@
                       </v-list-item-group>
                     </v-list-group>
                   </v-list>
-                </v-card>
+
               </v-sheet>
+              </v-card>
             </v-tab-item>
             <v-tab-item
             >

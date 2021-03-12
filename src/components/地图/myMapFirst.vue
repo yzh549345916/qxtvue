@@ -2,9 +2,9 @@
   <v-sheet style="height: 100%;" color="transparent" class="overflow-x-auto">
 
     <div class="maps" id="map" style="width:100%;height:98%;z-index:5;">
-      <maptool @tctoolbox-change='tcToolboxControlChange' v-drag></maptool>
-      <mapQbTimeControl v-drag @datetime-change='mapQbTimeControlChange' :lx-type="lxType" :yb-type="stationYbDataType" :data-type="stationYbType"></mapQbTimeControl>
-      <mapStationTool @stationType-change=stationTypeChange @stationDQ-change=stationDQChange   v-drag v-if="stationBs"></mapStationTool>
+      <maptool style="transform: scale(0.85,0.85)" @tctoolbox-change='tcToolboxControlChange' v-drag></maptool>
+      <mapQbTimeControl style="transform: scale(0.85,0.85)" v-drag @datetime-change='mapQbTimeControlChange' :lx-type="lxType" :yb-type="stationYbDataType" :data-type="stationYbType"></mapQbTimeControl>
+      <mapStationTool style="transform: scale(0.85,0.85)" @stationType-change=stationTypeChange @stationDQ-change=stationDQChange   v-drag v-if="stationBs"></mapStationTool>
     </div>
     <!-- 弹窗元素 -->
     <div
@@ -30,7 +30,7 @@
         ref="popupClick"
         v-show="currentCoordinateClick !==null"
     >
-      <StationDetails :stationYbQbTimespan="stationYbQbTimespan"  :StationID="SelectStationID" :stationlevel="stationlevel" :stationlevelType="stationlevelType" :yb-type="stationYbType" :data-type="stationYbDataType"></StationDetails>
+      <StationDetails style="transform: scale(0.85,0.85)" :stationYbQbTimespan="stationYbQbTimespan"  :StationID="SelectStationID" :stationlevel="stationlevel" :stationlevelType="stationlevelType" :yb-type="stationYbType" :data-type="stationYbDataType"></StationDetails>
     </div>
   </v-sheet>
 </template>

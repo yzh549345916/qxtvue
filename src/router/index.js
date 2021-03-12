@@ -28,16 +28,16 @@ export default new Router({
             path: "/Home",
             component: Home,
             meta: {
-                requireAuth: true
+                requireAuth: false//如果为true则需要登录
             }
             , children: [
-                {path: '/', redirect: encodeURI('/数值预报查询/数值预报图表查询/地图查询')},
+                {path: '/', meta: {requireAuth: false}, redirect: encodeURI('/数值预报查询/数值预报图表查询/地图查询')},
                 {
                     path: encodeURI("/主页"),
                     name: "主页",
                     component: 主页,
                     meta: {
-                        requireAuth: true
+                        requireAuth: false
                     }
                 }
                 , {
@@ -45,7 +45,7 @@ export default new Router({
                     name: "数值预报图表查询",
                     component: 数值预报图表查询,
                     meta: {
-                        requireAuth: true
+                        requireAuth: false
                     },children: [
                         {path: '/', redirect: encodeURI('/数值预报查询/数值预报图表查询/地图查询')},
                         {
@@ -53,7 +53,7 @@ export default new Router({
                             name: "单站多要素",
                             component: 单站多要素,
                             meta: {
-                                requireAuth: true
+                                requireAuth: false
                             }
                         },
                         {
@@ -61,7 +61,7 @@ export default new Router({
                             name: "多站单要素",
                             component: 多站单要素,
                             meta: {
-                                requireAuth: true
+                                requireAuth: false
                             }
                         },
                         {
@@ -69,7 +69,7 @@ export default new Router({
                             name: "地图查询",
                             component: myMapFirst,
                             meta: {
-                                requireAuth: true
+                                requireAuth: false
                             }
                         },
                         ]
