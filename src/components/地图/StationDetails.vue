@@ -34,6 +34,8 @@
       </v-row>
     </v-card-title>
     <v-data-table
+        dense
+
         class="tag-read"
         :headers="headers"
         :items="datas"

@@ -169,7 +169,14 @@ export default {
             {title: '气温'}, {title: '降水量'}, {title: '10米风'}, {title: '相对湿度'},{title: '能见度'},
           ],
         },
-
+        {
+          action: 'mdi-alpha-r-box',
+          title: 'EC',
+          active: false,
+          items: [
+            {title: '2米气温'}, {title: '总降水量'}, {title: '10米风'}, {title: '能见度'},{title: '露点温度'},{title: '地表温度'},{title: '海平面气压'},{title: '100米风'},{title: '过去3小时10米阵风'},{title: '过去6小时10米阵风'},{title: '过去3小时2米最低温度'},{title: '过去6小时2米最低温度'},{title: '过去6小时2米最高温度'},{title: '海表温度'},{title: '大尺度降水'},{title: '对流性降水'},{title: '降水类型'},{title: '降雪量'},{title: '雪深'},{title: '雪密度'},{title: '总云量'},{title: '低云量'},
+          ],
+        },
       ],
       tcmodel: 1,
       titleItem: [

@@ -210,7 +210,7 @@
 
 <script>
 import {getTodayHourAndMinute} from "@/assets/js/getTodaytimeFormat";
-
+import {ecIntToStr} from "@/assets/js/yaoSuDuiZhao";
 export default {
   name: "地图起报时间组件",
   data: function () {
@@ -247,6 +247,18 @@ export default {
           this.SCitems = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96];
         }
       }
+      else if (this.dataType === "EC") {
+        var scArr=[];
+        for(var i=0;i<=240;){
+          scArr.push(i);
+          if(i<72){
+            i+=3;
+          }else{
+            i+=6;
+          }
+        }
+        this.SCitems = scArr;
+      }
       this.ScSelectValue = this.SCitems[0];
       this.ybTimeSpan = this.qbTimeSpan + this.ScSelectValue * 60 * 60 * 1000;
       var date = new Date(this.ybTimeSpan);
@@ -269,7 +281,7 @@ export default {
       this.YbDateTimeChange();
     },
     lastTime: function () {
-      if (this.dataType === "区台新方法"||this.dataType === "RMAPS") {
+      if (this.dataType === "区台新方法"||this.dataType === "RMAPS"||this.dataType === "EC") {
         this.qbTimeSpan = this.qbTimeSpan - 12 * 60 * 60 * 1000;
         var date = new Date(this.qbTimeSpan);
         this.dateTime.date1 = date.toLocaleDateString().replace(/\//g, '-');
@@ -288,6 +300,19 @@ export default {
         if (timespnMin < this.qbTimeSpan + this.SCitems[0] * 60 * 60 * 1000) {
           return;
         }
+
+        this.ybTimeSpan = timespnMin;
+      }
+      else if(this.dataType === "EC"){
+        var mysx=(this.ybTimeSpan-this.qbTimeSpan)/1000/60/60;
+        if(mysx<=72){
+          timespnMin = this.ybTimeSpan - 3 * 60 * 60 * 1000;
+        }else{
+          timespnMin = this.ybTimeSpan - 6 * 60 * 60 * 1000;
+        }
+        if (timespnMin < this.qbTimeSpan + this.SCitems[0] * 60 * 60 * 1000) {
+          return;
+        }
         this.ybTimeSpan = timespnMin;
       }
     },
@@ -300,6 +325,18 @@ export default {
         this.ybTimeSpan = timespnMax;
       }else if (this.dataType === "RMAPS") {
         timespnMax = this.ybTimeSpan + 1 * 60 * 60 * 1000;
+        if (timespnMax > this.qbTimeSpan + this.SCitems[this.SCitems.length - 1] * 60 * 60 * 1000) {
+          return;
+        }
+        this.ybTimeSpan = timespnMax;
+      }
+      else if(this.dataType === "EC"){
+        var mysx=(this.ybTimeSpan-this.qbTimeSpan)/1000/60/60;
+        if(mysx<72){
+          timespnMax = this.ybTimeSpan + 3 * 60 * 60 * 1000;
+        }else{
+          timespnMax = this.ybTimeSpan + 6 * 60 * 60 * 1000;
+        }
         if (timespnMax > this.qbTimeSpan + this.SCitems[this.SCitems.length - 1] * 60 * 60 * 1000) {
           return;
         }
@@ -322,7 +359,7 @@ export default {
         var date = new Date(this.qbTimeSpan);
         this.dateTime.date1 = date.toLocaleDateString().replace(/\//g, '-');
         this.dateTime.time1 = date.toLocaleTimeString('chinese', {hour12: false}).slice(0, -3);
-      }else if (this.dataType === "RMAPS") {
+      }else if (this.dataType === "RMAPS"||this.dataType === "EC") {
         datemax = new Date();
         if (datemax.getHours() <= 13) {
           datemax = new Date(datemax.getTime()-24*60*60*1000);
@@ -361,14 +398,19 @@ export default {
     updateTitle(){
       if(this.lxType==="站点预报"){
         let ybStr="";
-        if(this.ybType===0){
-          ybStr="气温"
-        }else if(this.ybType===1){
-          ybStr="相对湿度"
-        }else if(this.ybType===2){
-          ybStr="降水量"
-        }else if(this.ybType===4){
-          ybStr="10米风"
+        if (this.dataType === "EC"){
+          ybStr=ecIntToStr(this.ybType)
+        }
+        else{
+          if(this.ybType===0){
+            ybStr="气温"
+          }else if(this.ybType===1){
+            ybStr="相对湿度"
+          }else if(this.ybType===2){
+            ybStr="降水量"
+          }else if(this.ybType===4){
+            ybStr="10米风"
+          }
         }
         this.titleText=this.lxType+'-'+this.dataType+'-'+ybStr+'-';
       }
@@ -383,6 +425,18 @@ export default {
         }else{
           this.SCitems = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96];
         }
+      }
+      else if (this.dataType === "EC") {
+        var scArr=[];
+        for(var i=0;i<=240;){
+          scArr.push(i);
+          if(i<72){
+            i+=3;
+          }else{
+            i+=6;
+          }
+        }
+        this.SCitems = scArr;
       }
     },
     updateQbtime(){

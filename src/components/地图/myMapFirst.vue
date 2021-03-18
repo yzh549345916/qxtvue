@@ -3,8 +3,10 @@
 
     <div class="maps" id="map" style="width:100%;height:98%;z-index:5;">
       <maptool style="transform: scale(0.85,0.85)" @tctoolbox-change='tcToolboxControlChange' v-drag></maptool>
-      <mapQbTimeControl style="transform: scale(0.85,0.85)" v-drag @datetime-change='mapQbTimeControlChange' :lx-type="lxType" :yb-type="stationYbDataType" :data-type="stationYbType"></mapQbTimeControl>
-      <mapStationTool style="transform: scale(0.85,0.85)" @stationType-change=stationTypeChange @stationDQ-change=stationDQChange   v-drag v-if="stationBs"></mapStationTool>
+      <mapQbTimeControl style="transform: scale(0.85,0.85)" v-drag @datetime-change='mapQbTimeControlChange'
+                        :lx-type="lxType" :yb-type="stationYbDataType" :data-type="stationYbType"></mapQbTimeControl>
+      <mapStationTool style="transform: scale(0.85,0.85)" @stationType-change=stationTypeChange
+                      @stationDQ-change=stationDQChange v-drag v-if="stationBs"></mapStationTool>
     </div>
     <!-- 弹窗元素 -->
     <div
@@ -30,7 +32,9 @@
         ref="popupClick"
         v-show="currentCoordinateClick !==null"
     >
-      <StationDetails style="transform: scale(0.85,0.85)" :stationYbQbTimespan="stationYbQbTimespan"  :StationID="SelectStationID" :stationlevel="stationlevel" :stationlevelType="stationlevelType" :yb-type="stationYbType" :data-type="stationYbDataType"></StationDetails>
+      <StationDetails style="transform: scale(0.85,0.85)" :stationYbQbTimespan="stationYbQbTimespan"
+                      :StationID="SelectStationID" :stationlevel="stationlevel" :stationlevelType="stationlevelType"
+                      :yb-type="stationYbType" :data-type="stationYbDataType"></StationDetails>
     </div>
   </v-sheet>
 </template>
@@ -49,7 +53,7 @@ import Point from 'ol/geom/Point';
 import Group from "ol/layer/Group";
 import Overlay from 'ol/Overlay'
 import GeoJSON from "ol/format/GeoJSON";
-import {fromLonLat,Projection,addProjection,addCoordinateTransforms} from 'ol/proj';
+import {fromLonLat, Projection, addProjection, addCoordinateTransforms} from 'ol/proj';
 import Feature from 'ol/Feature';
 import {Circle as CircleStyle, Fill, Stroke, Icon, Style, Text} from 'ol/style';
 import {XYZ, Vector, ImageWMS, Cluster} from "ol/source";
@@ -59,7 +63,7 @@ import mapStationTool from "@/components/地图/地图站点选择"
 import StationDetails from "@/components/地图/StationDetails"
 import LayerSwitcher from "ol-layerswitcher";
 import projzh from "@/assets/js/mypro";
-
+import {ecStrToInt} from "@/assets/js/yaoSuDuiZhao";
 export default {
   name: "myMapFirst",
   data() {
@@ -72,14 +76,14 @@ export default {
       stationYbQbTimespan: 1599220800000,
       stationYbSc: 9,
       stationYbType: "RMAPS",
-      lxType:"站点预报",
+      lxType: "站点预报",
       stationYbDataType: 0,
-      stationlevelType:0,
-      stationlevel:0,
+      stationlevelType: 0,
+      stationlevel: 0,
       stationYbStationTye: "国家站,区域站",
       stationYbDq: 1501,
-      stationBs:true,
-      SelectStationID:null
+      stationBs: true,
+      SelectStationID: null
     };
   },
   mounted() {
@@ -348,7 +352,7 @@ export default {
                       layers: [
                         new Tile({
                           source: new XYZ({
-                            projection:gcjMecator,
+                            projection: gcjMecator,
                             url:
                                 "http://wprd0{1-4}.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=2&style=6 ",
                           }),
@@ -369,7 +373,7 @@ export default {
                       layers: [
                         new Tile({
                           source: new XYZ({
-                            projection:gcjMecator,
+                            projection: gcjMecator,
                             url:
                                 "http://wprd0{1-4}.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=2&style=7 ",
 
@@ -424,7 +428,7 @@ export default {
                   layers: [
                     new Tile({
                       source: new XYZ({
-                        projection:gcjMecator,
+                        projection: gcjMecator,
                         url:
                             "http://rt{0-3}.map.gtimg.com/realtimerender?z={z}&x={x}&y={-y}&type=vector&style=0",
 
@@ -454,7 +458,7 @@ export default {
                   title: '高德标注',
                   visible: false,
                   source: new XYZ({
-                    projection:gcjMecator,
+                    projection: gcjMecator,
                     url:
                         "http://wprd0{1-4}.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=1&style=8",
                   }),
@@ -553,7 +557,7 @@ export default {
       this.overlay = new Overlay({
         element: this.$refs.popup1, // 弹窗标签，在html里
         autoPan: false, // true如果弹窗在底图边缘时，底图会移动
-        stopEvent:false,//特别重要！！！！！默认值为true，如果为true，则触发移动鼠标事件时候无法触发点击事件
+        stopEvent: false,//特别重要！！！！！默认值为true，如果为true，则触发移动鼠标事件时候无法触发点击事件
         autoPanAnimation: { // 底图移动动画
           duration: 250,
 
@@ -561,9 +565,9 @@ export default {
       })
       this.overlayClick = new Overlay({
         element: this.$refs.popupClick, // 弹窗标签，在html里
-        autoPan: true, // true如果弹窗在底图边缘时，底图会移动
-        stopEvent:true,
-        autoPanMargin:100
+        autoPan: false, // true如果弹窗在底图边缘时，底图会移动
+        stopEvent: true,
+        autoPanMargin: 100
       })
       this.map.addOverlay(this.overlayClick)
       this.map.addOverlay(this.overlay)
@@ -633,157 +637,39 @@ export default {
           this.map.removeLayer(mylayers[i]); //删除图层
         }
       }
-      var myurl="";
-      if(this.lxType==="站点预报"){
-        if(this.stationYbType==="区台新方法"||this.stationYbType==="RMAPS"){
-          if(this.stationYbType==="RMAPS"){
-            this.stationlevelType=103;
-            this.stationlevel=0;
-          }else if(this.stationYbType==="区台新方法"){
-            this.stationlevelType=0;
-            this.stationlevel=0;
+      var myurl = "";
+      if (this.lxType === "站点预报") {
+        if (this.stationYbType === "区台新方法" || this.stationYbType === "RMAPS"|| this.stationYbType === "EC") {
+          if (this.stationYbType === "RMAPS"|| this.stationYbType === "EC") {
+            this.stationlevelType = 103;
+            this.stationlevel = 0;
+          } else if (this.stationYbType === "区台新方法") {
+            this.stationlevelType = 0;
+            this.stationlevel = 0;
           }
-          myurl='/getzdybByTypeStationsTimeSx?YBType=' + this.stationYbType + '&DataTypeID=' + this.stationYbDataType + '&StationTye=' + this.stationYbStationTye + '&DQID=' + this.stationYbDq + '&times=' + this.stationYbQbTimespan + '&YbSx=' + this.stationYbSc+ '&stationlevelType=' + this.stationlevelType+ '&stationlevel=' + this.stationlevel;
+          myurl = '/getzdybByTypeStationsTimeSx?YBType=' + this.stationYbType + '&DataTypeID=' + this.stationYbDataType + '&StationTye=' + this.stationYbStationTye + '&DQID=' + this.stationYbDq + '&times=' + this.stationYbQbTimespan + '&YbSx=' + this.stationYbSc + '&stationlevelType=' + this.stationlevelType + '&stationlevel=' + this.stationlevel;
         }
-        if(myurl!==""){
+        if (myurl !== "") {
           this.$axios
               .get(myurl)
               .then(res => {
-                if (this.stationYbDataType === 0 || this.stationYbDataType === 1|| this.stationYbDataType === 2|| this.stationYbDataType === 1900) {
-                  var styleFunction2 = function (feature) {
-                    var myfetures = feature.get('features');
-                    var myfeture = myfetures[0];
-                    let minlevl = myfeture.get('stationLevel');
-                    for (let i = 0; i < myfetures.length; i++) {
-                      if (myfetures[i].get('stationLevel') < minlevl) {
-                        myfeture = myfetures[i];
-                        minlevl = myfeture.get('stationLevel');
-                      }
-                    }
-                    var slevel = myfeture.get('stationLevel');
-                    var style1 = new Style({
-                      image: new CircleStyle({
-                        radius: 5,
-                        fill: new Fill({color: '#0096fa', width: 4}),
-                      }),
-                      text: new Text({
-                        text: myfeture.get('ybvalue') + "",
-                        font: '15px Calibri,sans-serif',
-                        fill: new Fill({
-                          color: '#fff',
-                        }),
-                        stroke: new Stroke({color: '#000', width: 3}),
-                        offsetY: 15
-                      }),
-                    });
-                    var style2 = new Style({
-                      image: new CircleStyle({
-                        radius: 3,
-                        fill: new Fill({color: '#fafafa00'}),
-                        stroke: new Stroke({color: '#00d8fa', width: 2}),
-                      }),
-                      text: new Text({
-                        text: myfeture.get('ybvalue') + "",
-                        font: '13px Calibri,sans-serif',
-                        fill: new Fill({
-                          color: '#fff',
-                        }),
-                        stroke: new Stroke({color: '#000', width: 3}),
-                        offsetY: 15
-                      }),
-                    });
-                    if (slevel <= 13) {
-                      return style1;
-                    }
-                    return style2;
-                  };
-                  var myJson = (new GeoJSON()).readFeatures(res.data);
-                  var vecSource = new Vector({
-                    features: myJson,
-                  });
-                  var clusterSource = new Cluster({
-                    distance: 30,
-                    source: vecSource,
-                  });
-
-                  var layer = new VectorLayer({
-                    source: clusterSource,
-                    style: styleFunction2,
-                    name: this.lxType+'-'+this.stationYbType+'-'+this.stationYbDataType+'-'+"图层"
-                  });
-                  this.map.addLayer(layer);
-                  //this.map.on('pointermove', this.showInfo);
-
-
-                } else if (this.stationYbDataType === 4) {
-                  styleFunction2 = function (feature) {
-                    var myfetures = feature.get('features');
-                    var myfeture = myfetures[0];
-                    let minlevl = myfeture.get('stationLevel');
-                    for (let i = 0; i < myfetures.length; i++) {
-                      if (myfetures[i].get('stationLevel') < minlevl) {
-                        myfeture = myfetures[i];
-                        minlevl = myfeture.get('stationLevel');
-                      }
-                    }
-                    var fs=Math.round(myfeture.get('ybvalue')/2);
-                    var slevel = myfeture.get('stationLevel');
-                    var style1 = new Style({
-                      image: new Icon({
-                        src: '/images/wind/wind'+fs+'.png',
-                        color: '#0079fa',
-                        scale: 1.5,
-                        rotation: myfeture.get('ybvalue2')
-                      }),
-                      text: new Text({
-                        text: myfeture.get('ybvalue') + "",
-                        font: '15px Calibri,sans-serif',
-                        fill: new Fill({
-                          color: '#fff',
-                        }),
-                        stroke: new Stroke({color: '#000', width: 3}),
-                        offsetY: 20
-                      }),
-                    });
-                    var style2 = new Style({
-                      image: new Icon({
-                        src: '/images/wind/wind'+fs+'.png',
-                        color: '#2f02f8',
-                        scale: 1.2,
-                        rotation: myfeture.get('ybvalue2')
-                      }),
-                      text: new Text({
-                        text: myfeture.get('ybvalue') + "",
-                        font: '13px Calibri,sans-serif',
-                        fill: new Fill({
-                          color: '#fff',
-                        }),
-                        stroke: new Stroke({color: '#000', width: 3}),
-                        offsetY: 20
-                      }),
-                    });
-                    if (slevel <= 13) {
-                      return style1;
-                    }
-                    return style2;
-                  };
-                  myJson = (new GeoJSON()).readFeatures(res.data);
-                  vecSource = new Vector({
-                    features: myJson,
-                  });
-                  clusterSource = new Cluster({
-                    distance: 30,
-                    source: vecSource,
-                  });
-
-                  layer = new VectorLayer({
-                    source: clusterSource,
-                    style: styleFunction2,
-                    name: this.lxType+'-'+this.stationYbType+'-'+this.stationYbDataType+'-'+"图层"
-                  });
-                  this.map.addLayer(layer);
+                if(this.stationYbType==='EC'){
+                  if(this.stationYbDataType === 4||this.stationYbDataType === 4100){
+                    this.showWindFeatures(res);
+                  }else if(this.stationYbDataType >0){
+                    this.showCommonFeatures(res);
+                  }
 
                 }
+                else{
+                  if (this.stationYbDataType === 0 || this.stationYbDataType === 1 || this.stationYbDataType === 2 || this.stationYbDataType === 1900) {
+                   this.showCommonFeatures(res);
+                    //this.map.on('pointermove', this.showInfo);
+                  } else if (this.stationYbDataType === 4) {
+                    this.showWindFeatures(res);
+                  }
+                }
+
               })
               .catch(err => {
                 console.log(err);
@@ -793,6 +679,138 @@ export default {
       }
 
 
+    },
+    showCommonFeatures(res){
+      var styleFunction2 = function (feature) {
+        var myfetures = feature.get('features');
+        var myfeture = myfetures[0];
+        let minlevl = myfeture.get('stationLevel');
+        for (let i = 0; i < myfetures.length; i++) {
+          if (myfetures[i].get('stationLevel') < minlevl) {
+            myfeture = myfetures[i];
+            minlevl = myfeture.get('stationLevel');
+          }
+        }
+        var slevel = myfeture.get('stationLevel');
+        var style1 = new Style({
+          image: new CircleStyle({
+            radius: 5,
+            fill: new Fill({color: '#0096fa', width: 4}),
+          }),
+          text: new Text({
+            text: myfeture.get('ybvalue') + "",
+            font: '15px Calibri,sans-serif',
+            fill: new Fill({
+              color: '#fff',
+            }),
+            stroke: new Stroke({color: '#000', width: 3}),
+            offsetY: 15
+          }),
+        });
+        var style2 = new Style({
+          image: new CircleStyle({
+            radius: 3,
+            fill: new Fill({color: '#fafafa00'}),
+            stroke: new Stroke({color: '#00d8fa', width: 2}),
+          }),
+          text: new Text({
+            text: myfeture.get('ybvalue') + "",
+            font: '13px Calibri,sans-serif',
+            fill: new Fill({
+              color: '#fff',
+            }),
+            stroke: new Stroke({color: '#000', width: 3}),
+            offsetY: 15
+          }),
+        });
+        if (slevel <= 13) {
+          return style1;
+        }
+        return style2;
+      };
+      var myJson = (new GeoJSON()).readFeatures(res.data);
+      var vecSource = new Vector({
+        features: myJson,
+      });
+      var clusterSource = new Cluster({
+        distance: 30,
+        source: vecSource,
+      });
+
+      var layer = new VectorLayer({
+        source: clusterSource,
+        style: styleFunction2,
+        name: this.lxType + '-' + this.stationYbType + '-' + this.stationYbDataType + '-' + "图层"
+      });
+      this.map.addLayer(layer);
+    },
+    showWindFeatures(res){
+      var styleFunction2 = function (feature) {
+        var myfetures = feature.get('features');
+        var myfeture = myfetures[0];
+        let minlevl = myfeture.get('stationLevel');
+        for (let i = 0; i < myfetures.length; i++) {
+          if (myfetures[i].get('stationLevel') < minlevl) {
+            myfeture = myfetures[i];
+            minlevl = myfeture.get('stationLevel');
+          }
+        }
+        var fs = Math.round(myfeture.get('ybvalue') / 2);
+        var slevel = myfeture.get('stationLevel');
+        var style1 = new Style({
+          image: new Icon({
+            src: '/images/wind/wind' + fs + '.png',
+            color: '#0079fa',
+            scale: 1.5,
+            rotation: myfeture.get('ybvalue2')
+          }),
+          text: new Text({
+            text: myfeture.get('ybvalue') + "",
+            font: '15px Calibri,sans-serif',
+            fill: new Fill({
+              color: '#fff',
+            }),
+            stroke: new Stroke({color: '#000', width: 3}),
+            offsetY: 20
+          }),
+        });
+        var style2 = new Style({
+          image: new Icon({
+            src: '/images/wind/wind' + fs + '.png',
+            color: '#2f02f8',
+            scale: 1.2,
+            rotation: myfeture.get('ybvalue2')
+          }),
+          text: new Text({
+            text: myfeture.get('ybvalue') + "",
+            font: '13px Calibri,sans-serif',
+            fill: new Fill({
+              color: '#fff',
+            }),
+            stroke: new Stroke({color: '#000', width: 3}),
+            offsetY: 20
+          }),
+        });
+        if (slevel <= 13) {
+          return style1;
+        }
+        return style2;
+      };
+      var  myJson = (new GeoJSON()).readFeatures(res.data);
+      var vecSource = new Vector({
+        features: myJson,
+      });
+      var clusterSource = new Cluster({
+        distance: 30,
+        source: vecSource,
+      });
+
+      var layer = new VectorLayer({
+        source: clusterSource,
+        style: styleFunction2,
+        name: this.lxType + '-' + this.stationYbType + '-' + this.stationYbDataType + '-' + "图层"
+      });
+      this.map.addLayer(layer);
     },
     showInfo(event) {
       var features = this.map.getFeaturesAtPixel(event.pixel, {hitTolerance: 1});
@@ -812,12 +830,12 @@ export default {
       }
       const coordinate = event.coordinate // 获取坐标
 
-      if(this.stationYbDataType !== 4){
+      if (this.stationYbDataType !== 4) {
         this.currentCoordinate = myfeture.get('id') + "&nbsp;&nbsp;" + myfeture.get('name') + "&nbsp;&nbsp;" + myfeture.get('ybvalue') + myfeture.get('ybUnit')// 保存坐标点
-      }else{
-        var fxNum=Math.round(myfeture.get('ybvalue2')*180/Math.PI/45);
-        var fxStr="";
-        switch (fxNum){
+      } else {
+        var fxNum = Math.round(myfeture.get('ybvalue2') * 180 / Math.PI / 45);
+        var fxStr = "";
+        switch (fxNum) {
           case 0:
             fxStr = "北风";
             break;
@@ -849,7 +867,7 @@ export default {
             fxStr = "北风";
             break;
         }
-        this.currentCoordinate = myfeture.get('id') + "&nbsp;&nbsp;" + myfeture.get('name') + "&nbsp;&nbsp;" + myfeture.get('ybvalue') + myfeture.get('ybUnit')+ "&nbsp;&nbsp;" +fxStr// 保存坐标点
+        this.currentCoordinate = myfeture.get('id') + "&nbsp;&nbsp;" + myfeture.get('name') + "&nbsp;&nbsp;" + myfeture.get('ybvalue') + myfeture.get('ybUnit') + "&nbsp;&nbsp;" + fxStr// 保存坐标点
       }
 
       this.overlay.setPosition(coordinate)
@@ -870,13 +888,13 @@ export default {
         }
       }
       const coordinate = event.coordinate // 获取坐标
-      this.SelectStationID= myfeture.get('id');
-      if(this.stationYbDataType !== 4){
+      this.SelectStationID = myfeture.get('id');
+      if (this.stationYbDataType !== 4) {
         this.currentCoordinateClick = myfeture.get('id') + "&nbsp;&nbsp;" + myfeture.get('name') + "&nbsp;&nbsp;" + myfeture.get('ybvalue') + myfeture.get('ybUnit')// 保存坐标点
-      }else{
-        var fxNum=Math.round(myfeture.get('ybvalue2')*180/Math.PI/45);
-        var fxStr="";
-        switch (fxNum){
+      } else {
+        var fxNum = Math.round(myfeture.get('ybvalue2') * 180 / Math.PI / 45);
+        var fxStr = "";
+        switch (fxNum) {
           case 0:
             fxStr = "北风";
             break;
@@ -908,7 +926,7 @@ export default {
             fxStr = "北风";
             break;
         }
-        this.currentCoordinateClick = myfeture.get('id') + "&nbsp;&nbsp;" + myfeture.get('name') + "&nbsp;&nbsp;" + myfeture.get('ybvalue') + myfeture.get('ybUnit')+ "&nbsp;&nbsp;" +fxStr// 保存坐标点
+        this.currentCoordinateClick = myfeture.get('id') + "&nbsp;&nbsp;" + myfeture.get('name') + "&nbsp;&nbsp;" + myfeture.get('ybvalue') + myfeture.get('ybUnit') + "&nbsp;&nbsp;" + fxStr// 保存坐标点
       }
 
       this.overlayClick.setPosition(coordinate)
@@ -932,35 +950,45 @@ export default {
       this.displayStationYb();
     },
     stationTypeChange: function (stationTypeString) {
-     this.stationYbStationTye=stationTypeString;
+      this.stationYbStationTye = stationTypeString;
       this.displayStationYb();
     },
     stationDQChange: function (stationDQString) {
-      this.stationYbDq=stationDQString;
+      this.stationYbDq = stationDQString;
       this.displayStationYb();
     },
     tcToolboxControlChange: function (tabSelect, ybType, dataType) {
       if (tabSelect === 1) {
-        this.stationBs=true;
-        this.lxType="站点预报";
-        if (dataType === "气温") {
-          this.stationYbDataType = 0;
-        } else if (dataType === "相对湿度") {
-          this.stationYbDataType = 1;
-        } else if (dataType === "10米风") {
-          this.stationYbDataType = 4;
-        } else if (dataType === "降水量") {
-          this.stationYbDataType = 2;
-        }else if (dataType === "能见度") {
-          this.stationYbDataType = 1900;
-        }else {
-          this.stationYbDataType = -1;
+        this.stationBs = true;
+        this.lxType = "站点预报";
+        if (ybType === "EC") {
+          this.stationYbDataType =  ecStrToInt(dataType);
+        } else {
+          switch (dataType) {
+            case "气温":
+              this.stationYbDataType = 0;
+              break;
+            case "相对湿度":
+              this.stationYbDataType = 1;
+              break;
+            case "10米风":
+              this.stationYbDataType = 4;
+              break;
+            case "降水量":
+              this.stationYbDataType = 2;
+              break;
+            case "能见度":
+              this.stationYbDataType = 1900;
+              break;
+            default:
+              this.stationYbDataType = -1;
+              break;
+          }
         }
         this.stationYbType = ybType;
-      }
-      else if(tabSelect===0){
-        this.lxType="格点预报";
-        this.stationBs=false;
+      } else if (tabSelect === 0) {
+        this.lxType = "格点预报";
+        this.stationBs = false;
       }
       this.displayStationYb();
     },
@@ -982,6 +1010,7 @@ export default {
   left: -50px;
 
 }
+
 .popupClick {
   position: absolute;
   bottom: 12px;
