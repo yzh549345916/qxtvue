@@ -115,7 +115,13 @@ export default {
               if(index===0){
                 headerStr+=value2['text']+'\t';
               }
-              dataStr+=value[value2['value']]+'\t';
+              var myval=value[value2['value']];
+              if(!isNaN(myval)){
+                dataStr+=Math.round(myval)+'\t';
+              }else{
+                dataStr+=myval+'\t';
+              }
+
             })
             dataStr=dataStr.substring(0,dataStr.length-1);
             dataStr=dataStr+'\r\n';

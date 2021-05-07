@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <v-card class="mx-auto " width="50%" style="margin-top:10%" >
+    <v-card class="mx-auto "  width="50%" style="margin-top:10%" >
       <br><br><br>
       <v-row justify="center">
         <v-col  class="text-h5" cols="12" sm="6" md="6">

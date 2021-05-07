@@ -180,8 +180,6 @@
 
 <style lang="scss">
     @import './assets/styles/variables.scss';
-    @import "~@progress/kendo-theme-bootstrap/dist/all.scss";
-    @import "~bootstrap/scss/bootstrap.scss";
     @import './assets/styles/app.scss';
 </style>
 <style>

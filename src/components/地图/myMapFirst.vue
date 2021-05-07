@@ -2,6 +2,7 @@
   <v-sheet style="height: 100%;" color="transparent" class="overflow-x-auto">
 
     <div class="maps" id="map" style="width:100%;height:98%;z-index:5;">
+      <v-row><v-btn @click="csClick3">3公里</v-btn><v-btn @click="csClick5">5公里</v-btn><v-btn @click="csClick5">10公里</v-btn></v-row>
       <maptool style="transform: scale(0.85,0.85)" @tctoolbox-change='tcToolboxControlChange' v-drag></maptool>
       <mapQbTimeControl style="transform: scale(0.85,0.85)" v-drag @datetime-change='mapQbTimeControlChange'
                         :lx-type="lxType" :yb-type="stationYbDataType" :data-type="stationYbType"></mapQbTimeControl>
@@ -64,6 +65,10 @@ import StationDetails from "@/components/地图/StationDetails"
 import LayerSwitcher from "ol-layerswitcher";
 import projzh from "@/assets/js/mypro";
 import {ecStrToInt} from "@/assets/js/yaoSuDuiZhao";
+import { WindLayer } from 'ol-wind'
+/*import myjson3 from "../../assets/json/20210505/RMAPS_wind_2021050520_0020.json"
+import myjson5 from "../../assets/json/20210505/RMAPS_wind_0.05_2021050508_0000.json"
+import myjson10 from "../../assets/json/20210505/RMAPS_wind_0.1_2021050508_0000.json"*/
 export default {
   name: "myMapFirst",
   data() {
@@ -83,7 +88,43 @@ export default {
       stationYbStationTye: "国家站,区域站",
       stationYbDq: 1501,
       stationBs: true,
-      SelectStationID: null
+      SelectStationID: null,
+      mapZoom:0,
+      rmapsWindOpt:{
+        zIndex:1,
+        name:'风流场',
+        wrapX: true,
+        forceRender: false,
+        windOptions: {
+          // colorScale: scale,
+          velocityScale: 1/500,
+          paths: 200,
+          // eslint-disable-next-line no-unused-vars
+          colorScale: [
+            "rgb(8,67,248)",
+            "rgb(36,104, 180)",
+            "rgb(57,187,236)",
+            "rgb(8,167,3)",
+            "rgb(44,180,43)",
+            "rgb(93,238,111)",
+            /* "rgb(255,238,159)",
+            "rgb(252,217,125)",
+            "rgb(255,182,100)",
+            "rgb(252,150,75)",*/
+            "rgb(250,112,52)",
+            "rgb(245,64,32)",
+            "rgb(237,45,28)",
+            "rgb(220,24,32)",
+            "rgb(180,0,35)"
+          ],
+          lineWidth: 3,
+          // colorScale: scale,
+          //generateParticleOption: false
+        },
+        // map: map,
+        // projection: 'EPSG:4326'
+      },
+
     };
   },
   mounted() {
@@ -573,7 +614,10 @@ export default {
       this.map.addOverlay(this.overlay)
       this.map.on('singleclick', this.showClickInfo);
       this.map.on('pointermove', this.showInfo);
+
+      this.windcs();
     },
+
     addPoint() {
 
 
@@ -992,12 +1036,170 @@ export default {
       }
       this.displayStationYb();
     },
+    windcs(){
+
+      fetch('http://localhost:3691/api/getWindJsonByTypeTimeSx?YBType=RMAPS&times=1620259200000&YbSx=1&stationlevelType=103&stationlevel=0')
+          .then(res => res.json())
+          .then(res => {
+           // var myss=myjson;
+             const windLayer = new WindLayer(res,this.rmapsWindOpt);
+            // @ts-ignore
+            this.map.addLayer(windLayer);
+
+          });
+      this.map.getView().on('change:resolution',  this.zoomChange)
+    },
+    csClick5(){
+      //移除缩放监听事件
+     /* this.map.getView().un('change:resolution',  this.zoomChange)
+      this.map.getLayers().item(1).setWindOptions({
+        lineWidth: 3,
+        velocityScale: 1/3000,
+        paths: 60,
+      })*/
+      fetch('https://sakitam-1255686840.cos.ap-beijing.myqcloud.com/public/codepen/json/out.json')
+          .then(res => res.json())
+          .then(res => {
+            for(var i=0;i<this.map.getLayers().getLength();i++){
+              if(this.map.getLayers().item(i).get("name")==="风流场"){
+                this.clearWindCav(this.map.getLayers().removeAt (i))
+                this.map.addLayer(new WindLayer(res, this.rmapsWindOpt));
+                break
+              }
+            }
+          });
+    },
+    csClick3(){
+      fetch('http://localhost:3691/api/getWindJsonByTypeTimeSx?YBType=RMAPS&times=1620259200000&YbSx=1&stationlevelType=103&stationlevel=0')
+          .then(res => res.json())
+          .then(res => {
+            for(var i=0;i<this.map.getLayers().getLength();i++){
+              if(this.map.getLayers().item(i).get("name")==="风流场"){
+                this.clearWindCav(this.map.getLayers().removeAt (i))
+                this.map.addLayer(new WindLayer(res, this.rmapsWindOpt));
+                break
+              }
+            }
+          });
+    },
+    clearWindCav(windLayer){
+      const renderer = windLayer.getRenderer();
+      if (renderer && renderer.oRender) {
+        const executors = renderer.oRender.executors;
+        Object.keys(executors).forEach((key) => {
+          const wind = executors[key];
+          if (wind) {
+            wind.clearCanvas();
+          }
+        });
+      }
+    },
+    updateWindStyle(myZoom){
+      alert(myZoom)
+      var windLayer=undefined;
+      for(var i=0;i<this.map.getLayers().getLength();i++){
+        if(this.map.getLayers().item(i).get("name")==="风流场"){
+          windLayer=this.map.getLayers().item(i)
+          break
+        }
+      }
+      if(windLayer!==undefined){
+        if(myZoom>=0&&myZoom<4){
+          windLayer.setWindOptions({
+            lineWidth: 3,
+            velocityScale: 1/30,
+            paths: 6000,
+          })
+        }else if(myZoom>=4&&myZoom<8){
+          windLayer.setWindOptions({
+            lineWidth: 3,
+            velocityScale: 1/100,
+            paths: 600,
+          })
+        }else if(myZoom>=8&&myZoom<9){
+          windLayer.setWindOptions({
+            lineWidth: 3,
+            velocityScale: 1/(150*myZoom),
+            paths: 100*myZoom,
+          })
+        }
+        else if(myZoom>=9&&myZoom<10){
+          windLayer.setWindOptions({
+            lineWidth: 3,
+            velocityScale: 1/(250*myZoom),
+            paths: 100*myZoom,
+          })
+        }else if(myZoom>=10&&myZoom<11){
+          windLayer.setWindOptions({
+            lineWidth: 3,
+            velocityScale: 1/(400*myZoom),
+            paths: 60*myZoom,
+          })
+        }else if(myZoom>=11&&myZoom<13){
+          windLayer.setWindOptions({
+            lineWidth: 3,
+            velocityScale: 1/(100*myZoom*(myZoom-4)),
+            paths: 300*10/myZoom,
+          })
+        }else if(myZoom>=13&&myZoom<16.5){
+          windLayer.setWindOptions({
+            lineWidth: 3,
+            velocityScale: 1/(1000*myZoom*(myZoom-11.5)),
+            paths: 300*10/myZoom,
+          })
+        }else if(myZoom>=16.5&&myZoom<19){
+          windLayer.setWindOptions({
+            lineWidth: 3,
+            velocityScale: 1/(1000*myZoom*myZoom),
+            paths: 300*10/myZoom,
+          })
+        }/*else if(myZoom>=14&&myZoom<15){
+          windLayer.setWindOptions({
+            lineWidth: 3,
+            velocityScale: 1/(3000*myZoom),
+            paths: 300*10/myZoom,
+          })
+        }else if(myZoom>=15&&myZoom<16){
+          windLayer.setWindOptions({
+            lineWidth: 3,
+            velocityScale: 1/(4000*myZoom),
+            paths: 300*10/myZoom,
+          })
+        }else if(myZoom>=17&&myZoom<18){
+          windLayer.setWindOptions({
+            lineWidth: 3,
+            velocityScale: 1/(4000*myZoom),
+            paths: 300*10/myZoom,
+          })
+        }*/else{
+          windLayer.setWindOptions({
+            lineWidth: 3,
+            velocityScale: 1/(2000*myZoom),
+            paths: 280*10/myZoom,
+          })
+        }
+      }
+
+    },
+    zoomChange(){
+      let _this=this
+      setTimeout(function()  {
+
+        var myZoom=_this.map.getView().getZoom()
+        if(Math.abs(myZoom-_this.mapZoom)>0.005){
+          //alert(myZoom)
+          _this.updateWindStyle(myZoom)
+          _this.mapZoom=myZoom
+        }
+
+      }, 1500);
+    },
   },
   components: {
     maptool,
     mapQbTimeControl,
     mapStationTool,
-    StationDetails
+    StationDetails,
   }
 }
 </script>

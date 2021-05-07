@@ -237,7 +237,5 @@ export default {
   top: 1em;
   left: 5em;
   z-index: 6;
-
-
 }
 </style>
