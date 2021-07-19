@@ -2,12 +2,14 @@
   <v-sheet style="height: 100%;" color="transparent" class="overflow-x-auto">
 
     <div class="maps" id="map" style="width:100%;height:98%;z-index:5;">
-      <v-row><v-btn @click="csClick3">3公里</v-btn><v-btn @click="csClick5">5公里</v-btn><v-btn @click="csClick5">10公里</v-btn></v-row>
       <maptool style="transform: scale(0.85,0.85)" @tctoolbox-change='tcToolboxControlChange' v-drag></maptool>
       <mapQbTimeControl style="transform: scale(0.85,0.85)" v-drag @datetime-change='mapQbTimeControlChange'
-                        :lx-type="lxType" :yb-type="stationYbDataType" :data-type="stationYbType"></mapQbTimeControl>
+                        :lx-type="lxType" v-if="stationybTimeBs" :yb-type="stationYbDataType" :data-type="stationYbType"></mapQbTimeControl>
       <mapStationTool style="transform: scale(0.85,0.85)" @stationType-change=stationTypeChange
                       @stationDQ-change=stationDQChange v-drag v-if="stationBs"></mapStationTool>
+      <mapShaChenQbTimeControl style="transform: scale(0.85,0.85)" v-drag @datetime-change='mapShaChenQbTimeControlChange'
+                        :lx-type="lxType" v-if="shaChenStationBs" :dataTypeStr="dataTypeStr" :data-type="stationYbType"></mapShaChenQbTimeControl>
+
     </div>
     <!-- 弹窗元素 -->
     <div
@@ -17,10 +19,9 @@
 
     >
       <v-chip
-
           @click:close="closePopup"
-          close
       >
+<!--        close-->
         <v-avatar left>
           <v-icon color="primary">mdi-artstation</v-icon>
         </v-avatar>
@@ -37,12 +38,23 @@
                       :StationID="SelectStationID" :stationlevel="stationlevel" :stationlevelType="stationlevelType"
                       :yb-type="stationYbType" :data-type="stationYbDataType"></StationDetails>
     </div>
+    <!-- 点击弹窗元素 -->
+    <div
+        class="shaChenClick"
+        ref="shaChenClick"
+        v-show="shachenCoordinateClick !==null"
+    >
+      <shachenStationDetails style="transform: scale(0.85,0.85)" :stationYbQbTimespan="stationYbQbTimespan"
+                      :StationID="SelectStationID" :stationlevel="stationlevel" :stationlevelType="stationlevelType"
+                      :yb-type="stationYbType" :data-type="stationYbDataType"></shachenStationDetails>
+    </div>
   </v-sheet>
 </template>
 <script>
 import "@/assets/styles/ol.css";
 import "@/assets/styles/ol-layerswitcher.css";
 import {Map, View} from "ol";
+import {unByKey} from "ol/Observable"
 import Tile from "ol/layer/Tile";
 import VectorLayer from "ol/layer/Vector";
 import {format} from 'ol/coordinate';
@@ -60,15 +72,15 @@ import {Circle as CircleStyle, Fill, Stroke, Icon, Style, Text} from 'ol/style';
 import {XYZ, Vector, ImageWMS, Cluster} from "ol/source";
 import maptool from "@/components/地图/地图工具组件"
 import mapQbTimeControl from '@/components/基础组件/地图起报时间组件'
+import mapShaChenQbTimeControl from '@/components/基础组件/地图沙尘起报时间组件'
 import mapStationTool from "@/components/地图/地图站点选择"
 import StationDetails from "@/components/地图/StationDetails"
+import shachenStationDetails from "@/components/地图/shachenStationDetails";
 import LayerSwitcher from "ol-layerswitcher";
 import projzh from "@/assets/js/mypro";
-import {ecStrToInt} from "@/assets/js/yaoSuDuiZhao";
+import {ecStrToInt,qtShaChenDataTypeConvert,cuaceDataTypeConvert} from "@/assets/js/yaoSuDuiZhao";
 import { WindLayer } from 'ol-wind'
-/*import myjson3 from "../../assets/json/20210505/RMAPS_wind_2021050520_0020.json"
-import myjson5 from "../../assets/json/20210505/RMAPS_wind_0.05_2021050508_0000.json"
-import myjson10 from "../../assets/json/20210505/RMAPS_wind_0.1_2021050508_0000.json"*/
+/*import myjson from '../../assets/json/2.json'*/
 export default {
   name: "myMapFirst",
   data() {
@@ -76,29 +88,38 @@ export default {
       map: {},
       currentCoordinate: null, // 弹窗坐标数据
       currentCoordinateClick: null, // 弹窗坐标数据
+      shachenCoordinateClick: null, // 沙尘弹窗坐标数据
       overlay: null,
       overlayClick: null,
+      overlayShachenClick: null,
       stationYbQbTimespan: 1599220800000,
       stationYbSc: 9,
+      clickKey:null,
+      showinfoKey:null,
       stationYbType: "RMAPS",
       lxType: "站点预报",
       stationYbDataType: 0,
+      dataTypeStr:"",
       stationlevelType: 0,
       stationlevel: 0,
       stationYbStationTye: "国家站,区域站",
       stationYbDq: 1501,
       stationBs: true,
-      SelectStationID: null,
+      stationybTimeBs:true,
+      shaChenStationBs: false,
+      SelectStationID: "",
       mapZoom:0,
+      heighBs:false,
       rmapsWindOpt:{
         zIndex:1,
         name:'风流场',
         wrapX: true,
+        minZoom:4,
         forceRender: false,
         windOptions: {
           // colorScale: scale,
-          velocityScale: 1/500,
-          paths: 200,
+          velocityScale: 1/3300,
+          paths: 600,
           // eslint-disable-next-line no-unused-vars
           colorScale: [
             "rgb(8,67,248)",
@@ -121,10 +142,8 @@ export default {
           // colorScale: scale,
           //generateParticleOption: false
         },
-        // map: map,
-        // projection: 'EPSG:4326'
       },
-
+      zoomLs:0,
     };
   },
   mounted() {
@@ -544,13 +563,13 @@ export default {
         view: new View({
           projection: "EPSG:4326",
           center: [111.70893300, 40.76124776],
-          zoom: 10
+          zoom: 8.5
         })
       });
       //鼠标获取坐标控件
       const mousePositionControl = new MousePosition({
         coordinateFormat: function (coordinate) {
-          return format(coordinate, '经度:{x} 纬度:{y}', 4);
+          return format(coordinate, '经度:{x} 纬度:{y}'+3, 4);
         },
         projection: 'EPSG:4326',
         /* ol-mouse-position*/
@@ -562,34 +581,6 @@ export default {
         tipLabel: '全屏显示'
       }));
       this.map.addControl(new ScaleLine());
-      /* this.map.addControl(new OverviewMap({
-         layers: [
-           new Image({
-             title: '边界',
-
-             source: new ImageWMS({
-               url: "http://172.18.142.202:8880/geoserver/yzhGeoserver/wms",
-               // Layers需要指定要显示的图层名
-               params: { LAYERS: "yzhGeoserver:ChinaBj",TILED:false },
-               // serverType明显为geoserver
-               serverType: "geoserver",
-
-               ratio:1
-             }),
-           }),
-           /!*ew Vector({
-             visible: false,
-             source: new Stamen({
-               projection: 'EPSG:4326',
-               url: "../json/旗县界.json",
-               format:GeoJSON(),
-             }),
-           })*!/
-
-         ]
-
-       }));*/
-
       var layerSwitcher = new LayerSwitcher({
         tipLabel: 'Légende', // Optional label for button
         groupSelectStyle: 'children' // Can be 'children' [default], 'group' or 'none'
@@ -610,17 +601,20 @@ export default {
         stopEvent: true,
         autoPanMargin: 100
       })
+      this.overlayShachenClick=new Overlay({
+        element: this.$refs.shaChenClick, // 弹窗标签，在html里
+        autoPan: false, // true如果弹窗在底图边缘时，底图会移动
+        stopEvent: true,
+        autoPanMargin: 100
+      })
       this.map.addOverlay(this.overlayClick)
+      this.map.addOverlay(this.overlayShachenClick)
       this.map.addOverlay(this.overlay)
-      this.map.on('singleclick', this.showClickInfo);
-      this.map.on('pointermove', this.showInfo);
-
-      this.windcs();
+      this.clickKey=this.map.on('singleclick', this.showClickInfo);
+      this.showinfoKey=this.map.on('pointermove', this.showInfo);
     },
 
     addPoint() {
-
-
       var myStyle = new Style({
         image: new CircleStyle({
           radius: 5,
@@ -672,19 +666,38 @@ export default {
 
           });
     },
-    displayStationYb() {
+    displayStationYb: function () {
       var mylayers = this.map.getLayers().getArray();
+      var removeArry = [];
       for (let i = 0; i < mylayers.length; i++) {
-        var name = mylayers[i].get("name");
-        if (name !== undefined && name.indexOf("站点预报") !== -1) {
-          // mylayers[i].setVisible(true);//设置图层显隐
-          this.map.removeLayer(mylayers[i]); //删除图层
+        let name = mylayers[i].get("name");
+        if (name !== undefined && (name.indexOf("站点预报") !== -1 || name.indexOf("格点预报") !== -1 || name.indexOf("沙尘模式") !== -1 || name === "风流场")) {
+          removeArry.push(mylayers[i])
+          //this.map.removeLayer(mylayers[i]); //删除图层
+        }
+      }
+      if (removeArry.length > 0) {
+        for (let i = 0; i < removeArry.length; i++) {
+          let name = removeArry[i].get("name");
+          if (name === "风流场") {
+            this.clearWindCav(this.map.removeLayer(removeArry[i]))
+          } else {
+            this.map.removeLayer(removeArry[i]); //删除图层
+          }
         }
       }
       var myurl = "";
       if (this.lxType === "站点预报") {
-        if (this.stationYbType === "区台新方法" || this.stationYbType === "RMAPS"|| this.stationYbType === "EC") {
-          if (this.stationYbType === "RMAPS"|| this.stationYbType === "EC") {
+        if(this.showinfoKey!==null){
+          unByKey(this.showinfoKey);
+        }
+        if(this.clickKey!==null){
+          unByKey(this.clickKey);
+        }
+        this.clickKey = this.map.on('singleclick', this.showClickInfo);
+        this.showinfoKey=this.map.on('pointermove', this.showInfo);
+        if (this.stationYbType === "区台新方法" || this.stationYbType === "RMAPS" || this.stationYbType === "EC") {
+          if (this.stationYbType === "RMAPS" || this.stationYbType === "EC") {
             this.stationlevelType = 103;
             this.stationlevel = 0;
           } else if (this.stationYbType === "区台新方法") {
@@ -694,6 +707,48 @@ export default {
           myurl = '/getzdybByTypeStationsTimeSx?YBType=' + this.stationYbType + '&DataTypeID=' + this.stationYbDataType + '&StationTye=' + this.stationYbStationTye + '&DQID=' + this.stationYbDq + '&times=' + this.stationYbQbTimespan + '&YbSx=' + this.stationYbSc + '&stationlevelType=' + this.stationlevelType + '&stationlevel=' + this.stationlevel;
         }
         if (myurl !== "") {
+          this.$axios
+              .get(myurl)
+              .then(res => {
+                if (this.stationYbType === 'EC') {
+                  if (this.stationYbDataType === 4 || this.stationYbDataType === 4100) {
+                    this.showWindFeatures(res);
+                  } else if (this.stationYbDataType > 0) {
+                    this.showCommonFeatures(res);
+                  }
+
+                } else {
+                  if (this.stationYbDataType === 0 || this.stationYbDataType === 1 || this.stationYbDataType === 2 || this.stationYbDataType === 1900) {
+                    this.showCommonFeatures(res);
+                    //this.map.on('pointermove', this.showInfo);
+                  } else if (this.stationYbDataType === 4) {
+                    this.showWindFeatures(res);
+                  }
+                }
+
+              })
+              .catch(err => {
+                console.log(err);
+              });
+        }
+      } else if (this.lxType === "格点预报") {
+        if(this.showinfoKey!==null){
+          unByKey(this.showinfoKey);
+        }
+        if(this.clickKey!==null){
+          unByKey(this.clickKey);
+        }
+        if (this.stationYbType === "区台新方法" || this.stationYbType === "RMAPS" || this.stationYbType === "EC") {
+          if (this.stationYbType === "RMAPS" || this.stationYbType === "EC") {
+            this.stationlevelType = 103;
+            this.stationlevel = 0;
+          } else if (this.stationYbType === "区台新方法") {
+            this.stationlevelType = 0;
+            this.stationlevel = 0;
+          }
+          //myurl = '/getzdybByTypeStationsTimeSx?YBType=' + this.stationYbType + '&DataTypeID=' + this.stationYbDataType + '&StationTye=' + this.stationYbStationTye + '&DQID=' + this.stationYbDq + '&times=' + this.stationYbQbTimespan + '&YbSx=' + this.stationYbSc + '&stationlevelType=' + this.stationlevelType + '&stationlevel=' + this.stationlevel;
+        }
+        /*if (myurl !== "") {
           this.$axios
               .get(myurl)
               .then(res => {
@@ -707,7 +762,7 @@ export default {
                 }
                 else{
                   if (this.stationYbDataType === 0 || this.stationYbDataType === 1 || this.stationYbDataType === 2 || this.stationYbDataType === 1900) {
-                   this.showCommonFeatures(res);
+                    this.showCommonFeatures(res);
                     //this.map.on('pointermove', this.showInfo);
                   } else if (this.stationYbDataType === 4) {
                     this.showWindFeatures(res);
@@ -718,11 +773,49 @@ export default {
               .catch(err => {
                 console.log(err);
               });
+        }*/
+        if (this.stationYbDataType === 4 && this.stationYbType === "RMAPS") {
+          this.addWindLayer()
         }
+      } else if (this.lxType === "沙尘模式") {
+        if (!(this.dataTypeStr === "")) {
+          if(this.clickKey!==null){
+            unByKey(this.clickKey);
+          }
+          if(this.showinfoKey!==null){
+            unByKey(this.showinfoKey);
+          }
+          this.clickKey= this.map.on('singleclick', this.showShaChenClickInfo);
+          this.showinfoKey=this.map.on('pointermove', this.showShaChenInfo);
+          myurl = "/getDustByDateTimeValidTimeIsHeighFcstlevel?times=" + this.stationYbQbTimespan + "&YbSx=" + this.stationYbSc + "&YBType=" + this.stationYbType + "&DataTypeStr=" + this.dataTypeStr + "&IsHeigh=" + this.heighBs + "&Fcstlevel=" + this.stationlevel;
+          if (myurl !== "") {
+            this.$axios
+                .get(myurl)
+                .then(res => {
+                  this.showShaChenFeatures(res);
 
+                })
+                .catch(err => {
+                  console.log(err);
+                });
+          }
+        }
       }
+    },
+    addWindLayer(){
+      fetch('http://172.18.142.203:3691/api/getWindJsonByTypeTimeSx?YBType=' + this.stationYbType + '&times=' + this.stationYbQbTimespan + '&YbSx=' + this.stationYbSc + '&stationlevelType=' + this.stationlevelType + '&stationlevel=' + this.stationlevel+'&dlat=0.03')
+          //
+          .then(res => res.json())
+          .then(res => {
+            // var myss=myjson;
+            var myZoom=this.map.getView().getZoom()
+            this.updateWindStyle(myZoom)
+            const windLayer = new WindLayer(res,this.rmapsWindOpt);
+            // @ts-ignore
+            this.map.addLayer(windLayer);
 
-
+          });
+      this.map.getView().on('change:resolution',  this.zoomChange)
     },
     showCommonFeatures(res){
       var styleFunction2 = function (feature) {
@@ -785,6 +878,44 @@ export default {
         source: clusterSource,
         style: styleFunction2,
         name: this.lxType + '-' + this.stationYbType + '-' + this.stationYbDataType + '-' + "图层"
+      });
+      this.map.addLayer(layer);
+    },
+    showShaChenFeatures(res){
+      var styleFunction2 = function (feature) {
+        var myfetures = feature.get('features');
+        var myfeture = myfetures[0];
+        var style2 = new Style({
+          image: new CircleStyle({
+            radius: 3,
+            fill: new Fill({color: '#fafafa00'}),
+            stroke: new Stroke({color: '#0387ea', width: 2}),
+          }),
+          text: new Text({
+            text: myfeture.get('ybvalue').toFixed(2) + "",
+            font: '13px Calibri,sans-serif',
+            fill: new Fill({
+              color: '#fff',
+            }),
+            stroke: new Stroke({color: '#000', width: 3}),
+            offsetY: 15
+          }),
+        });
+        return style2;
+      };
+      var myJson = (new GeoJSON()).readFeatures(res.data);
+      var vecSource = new Vector({
+        features: myJson,
+      });
+      var clusterSource = new Cluster({
+        distance: 30,
+        source: vecSource,
+      });
+
+      var layer = new VectorLayer({
+        source: clusterSource,
+        style: styleFunction2,
+        name: this.lxType + '-' + this.stationYbType + '-' + this.dataTypeStr + '-' + "图层"
       });
       this.map.addLayer(layer);
     },
@@ -873,9 +1004,8 @@ export default {
         }
       }
       const coordinate = event.coordinate // 获取坐标
-
       if (this.stationYbDataType !== 4) {
-        this.currentCoordinate = myfeture.get('id') + "&nbsp;&nbsp;" + myfeture.get('name') + "&nbsp;&nbsp;" + myfeture.get('ybvalue') + myfeture.get('ybUnit')// 保存坐标点
+        this.currentCoordinate = myfeture.get('id') + "&nbsp;&nbsp;" + myfeture.get('name') + "&nbsp;&nbsp;" + myfeture.get('ybvalue').toFixed(2) + myfeture.get('ybUnit')// 保存坐标点
       } else {
         var fxNum = Math.round(myfeture.get('ybvalue2') * 180 / Math.PI / 45);
         var fxStr = "";
@@ -916,9 +1046,30 @@ export default {
 
       this.overlay.setPosition(coordinate)
     },
+    showShaChenInfo(event) {
+     try{
+       var features = this.map.getFeaturesAtPixel(event.pixel, {hitTolerance: 1});
+
+       if (features.length == 0) {
+         this.closePopup();
+         return;
+       }
+       var myfetures = features[0].getProperties().features;
+       var myfeture = myfetures[0];
+       const coordinate = event.coordinate // 获取坐标
+       if(this.heighBs){
+         this.currentCoordinate = myfeture.get('id') + "&nbsp;&nbsp;" + myfeture.get('name') + "&nbsp;&nbsp;"+this.stationlevel+ "hPa&nbsp;&nbsp;"+ myfeture.get('ybName') +  "&nbsp;&nbsp;" + myfeture.get('ybvalue').toFixed(2) + myfeture.get('ybUnit')// 保存坐标点
+       }else{
+         this.currentCoordinate = myfeture.get('id') + "&nbsp;&nbsp;" + myfeture.get('name') + "&nbsp;&nbsp;"+ myfeture.get('ybName') + "&nbsp;&nbsp;" + myfeture.get('ybvalue').toFixed(2) + myfeture.get('ybUnit')// 保存坐标点
+       }
+
+       this.overlay.setPosition(coordinate)
+     }
+     catch (error){}
+    },
     showClickInfo(event) {
       var features = this.map.getFeaturesAtPixel(event.pixel, {hitTolerance: 1});
-      if (features.length == 0) {
+      if (features.length === 0) {
         this.closeClickPopup();
         return;
       }
@@ -975,6 +1126,22 @@ export default {
 
       this.overlayClick.setPosition(coordinate)
     },
+    showShaChenClickInfo(event) {
+      try{
+        var features = this.map.getFeaturesAtPixel(event.pixel, {hitTolerance: 1});
+        if (features.length === 0) {
+          this.closeSchaChenClickPopup();
+          return;
+        }
+        /*var myfetures = features[0].getProperties().features;
+        var myfeture = myfetures[0];*/
+        const coordinate = event.coordinate // 获取坐标
+        /* this.SelectStationID = myfeture.get('id');
+         this.shachenCoordinateClick = myfeture.get('id') + "&nbsp;&nbsp;" + myfeture.get('name') + "&nbsp;&nbsp;" + myfeture.get('ybvalue') + myfeture.get('ybUnit')// 保存坐标点*/
+        this.overlayShachenClick.setPosition(coordinate)
+        alert(coordinate)
+      }catch (error){}
+    },
     // 关闭弹窗
     closePopup() {
       // 把弹窗位置设置为undefined，并清空坐标数据
@@ -987,10 +1154,22 @@ export default {
       this.overlayClick.setPosition(undefined)
       this.currentCoordinateClick = null
     },
+    closeSchaChenClickPopup() {
+      // 把弹窗位置设置为undefined，并清空坐标数据
+      this.overlayShachenClick.setPosition(undefined)
+      this.shachenCoordinateClick = null
+    },
 
     mapQbTimeControlChange: function (qbTimeSpan, ScSelectValue) {
       this.stationYbQbTimespan = qbTimeSpan;
       this.stationYbSc = ScSelectValue;
+      this.displayStationYb();
+    },
+    mapShaChenQbTimeControlChange: function (qbTimeSpan, ScSelectValue,heighBs,heightSelectValue) {
+      this.stationYbQbTimespan = qbTimeSpan;
+      this.stationYbSc = ScSelectValue;
+      this.heighBs=heighBs;
+      this.stationlevel=heightSelectValue;
       this.displayStationYb();
     },
     stationTypeChange: function (stationTypeString) {
@@ -1003,7 +1182,9 @@ export default {
     },
     tcToolboxControlChange: function (tabSelect, ybType, dataType) {
       if (tabSelect === 1) {
+        this.shaChenStationBs=false;
         this.stationBs = true;
+        this.stationybTimeBs=true;
         this.lxType = "站点预报";
         if (ybType === "EC") {
           this.stationYbDataType =  ecStrToInt(dataType);
@@ -1032,56 +1213,55 @@ export default {
         this.stationYbType = ybType;
       } else if (tabSelect === 0) {
         this.lxType = "格点预报";
+        this.shaChenStationBs=false;
         this.stationBs = false;
+        this.stationybTimeBs=true;
+        if (ybType === "EC") {
+          this.stationYbDataType =  ecStrToInt(dataType);
+        } else {
+          switch (dataType) {
+            case "气温":
+              this.stationYbDataType = 0;
+              break;
+            case "相对湿度":
+              this.stationYbDataType = 1;
+              break;
+            case "10米风":
+              this.stationYbDataType = 4;
+              break;
+            case "降水量":
+              this.stationYbDataType = 2;
+              break;
+            case "能见度":
+              this.stationYbDataType = 1900;
+              break;
+            default:
+              this.stationYbDataType = -1;
+              break;
+          }
+        }
+        this.stationYbType = ybType;
+      }else if(tabSelect===2){
+        this.stationybTimeBs=false;
+        this.stationBs = false;
+        this.shaChenStationBs=true;
+        this.station
+        this.lxType = "沙尘模式";
+        if((ybType==="区台沙尘模式"&&(dataType==="PM2.5"||dataType==="PM10"))||(ybType==="亚洲沙尘模式"&&(dataType==="高空沙尘浓度CONC_DUST"))){
+          this.heighBs=true;
+        }else{
+          this.heighBs=false;
+        }
+        if(ybType==="区台沙尘模式"){
+          this.dataTypeStr=qtShaChenDataTypeConvert(dataType);
+        }else if(ybType==="亚洲沙尘模式"){
+          this.dataTypeStr=cuaceDataTypeConvert(dataType);
+        }
+        this.stationYbType = ybType;
       }
       this.displayStationYb();
     },
-    windcs(){
 
-      fetch('http://localhost:3691/api/getWindJsonByTypeTimeSx?YBType=RMAPS&times=1620259200000&YbSx=1&stationlevelType=103&stationlevel=0')
-          .then(res => res.json())
-          .then(res => {
-           // var myss=myjson;
-             const windLayer = new WindLayer(res,this.rmapsWindOpt);
-            // @ts-ignore
-            this.map.addLayer(windLayer);
-
-          });
-      this.map.getView().on('change:resolution',  this.zoomChange)
-    },
-    csClick5(){
-      //移除缩放监听事件
-     /* this.map.getView().un('change:resolution',  this.zoomChange)
-      this.map.getLayers().item(1).setWindOptions({
-        lineWidth: 3,
-        velocityScale: 1/3000,
-        paths: 60,
-      })*/
-      fetch('https://sakitam-1255686840.cos.ap-beijing.myqcloud.com/public/codepen/json/out.json')
-          .then(res => res.json())
-          .then(res => {
-            for(var i=0;i<this.map.getLayers().getLength();i++){
-              if(this.map.getLayers().item(i).get("name")==="风流场"){
-                this.clearWindCav(this.map.getLayers().removeAt (i))
-                this.map.addLayer(new WindLayer(res, this.rmapsWindOpt));
-                break
-              }
-            }
-          });
-    },
-    csClick3(){
-      fetch('http://localhost:3691/api/getWindJsonByTypeTimeSx?YBType=RMAPS&times=1620259200000&YbSx=1&stationlevelType=103&stationlevel=0')
-          .then(res => res.json())
-          .then(res => {
-            for(var i=0;i<this.map.getLayers().getLength();i++){
-              if(this.map.getLayers().item(i).get("name")==="风流场"){
-                this.clearWindCav(this.map.getLayers().removeAt (i))
-                this.map.addLayer(new WindLayer(res, this.rmapsWindOpt));
-                break
-              }
-            }
-          });
-    },
     clearWindCav(windLayer){
       const renderer = windLayer.getRenderer();
       if (renderer && renderer.oRender) {
@@ -1094,8 +1274,65 @@ export default {
         });
       }
     },
+    zoomChange(){
+      let _this=this
+      setTimeout(function()  {
+
+        var myZoom=_this.map.getView().getZoom()
+        _this.zoomLs=myZoom
+        if(Math.abs(myZoom-_this.mapZoom)>0.1){
+          //alert(myZoom)
+          _this.updateWindStyle(myZoom)
+          if((myZoom>7&&_this.mapZoom<=7)){
+            _this.setWindData(0.03)
+          }else if(myZoom<=7&&_this.mapZoom>7){
+            _this.setWindData(0.1)
+          }else{
+            _this.updateWindStyleOnly()
+          }
+          _this.mapZoom=myZoom
+        }
+
+      }, 1500);
+    },
     updateWindStyle(myZoom){
-      alert(myZoom)
+      if(myZoom>=0&&myZoom<4){
+        this.rmapsWindOpt.windOptions.velocityScale= 1/300
+        this.rmapsWindOpt.windOptions.paths= 3000
+      }else if(myZoom>=4&&myZoom<6){
+        this.rmapsWindOpt.windOptions.velocityScale= 1/(20*myZoom)
+        this.rmapsWindOpt.windOptions.paths= 80*myZoom
+      }else if(myZoom>=6&&myZoom<7){
+        this.rmapsWindOpt.windOptions.velocityScale= 1/(40*myZoom)
+        this.rmapsWindOpt.windOptions.paths= 300*10/myZoom
+      }else if(myZoom>=7&&myZoom<8){
+        this.rmapsWindOpt.windOptions.velocityScale= 1/(100*myZoom)
+        this.rmapsWindOpt.windOptions.paths= 280*10/myZoom
+      }else if(myZoom>=8&&myZoom<9){
+        this.rmapsWindOpt.windOptions.velocityScale= 1/(80*myZoom)
+        this.rmapsWindOpt.windOptions.paths= 80*myZoom
+      }
+      else if(myZoom>=9&&myZoom<10){
+        this.rmapsWindOpt.windOptions.velocityScale= 1/(250*myZoom)
+        this.rmapsWindOpt.windOptions.paths= 80*myZoom
+      }else if(myZoom>=10&&myZoom<11){
+        this.rmapsWindOpt.windOptions.velocityScale= 1/(350*myZoom)
+        this.rmapsWindOpt.windOptions.paths= 60*myZoom
+      }else if(myZoom>=11&&myZoom<13){
+        this.rmapsWindOpt.windOptions.velocityScale= 1/(100*myZoom*(myZoom-4))
+        this.rmapsWindOpt.windOptions.paths= 300*10/myZoom
+      }else if(myZoom>=13&&myZoom<16.5){
+        this.rmapsWindOpt.windOptions.velocityScale=  1/(1000*myZoom*(myZoom-11.5))
+        this.rmapsWindOpt.windOptions.paths= 300*10/myZoom
+      }else if(myZoom>=16.5&&myZoom<19){
+        this.rmapsWindOpt.windOptions.velocityScale=  1/(1000*myZoom*myZoom)
+        this.rmapsWindOpt.windOptions.paths= 300*10/myZoom
+      }else{
+        this.rmapsWindOpt.windOptions.velocityScale=  1/(1000*myZoom*myZoom)
+        this.rmapsWindOpt.windOptions.paths= 300*10/myZoom
+      }
+      },
+    updateWindStyleOnly(){
       var windLayer=undefined;
       for(var i=0;i<this.map.getLayers().getLength();i++){
         if(this.map.getLayers().item(i).get("name")==="风流场"){
@@ -1104,102 +1341,37 @@ export default {
         }
       }
       if(windLayer!==undefined){
-        if(myZoom>=0&&myZoom<4){
-          windLayer.setWindOptions({
-            lineWidth: 3,
-            velocityScale: 1/30,
-            paths: 6000,
-          })
-        }else if(myZoom>=4&&myZoom<8){
-          windLayer.setWindOptions({
-            lineWidth: 3,
-            velocityScale: 1/100,
-            paths: 600,
-          })
-        }else if(myZoom>=8&&myZoom<9){
-          windLayer.setWindOptions({
-            lineWidth: 3,
-            velocityScale: 1/(150*myZoom),
-            paths: 100*myZoom,
-          })
-        }
-        else if(myZoom>=9&&myZoom<10){
-          windLayer.setWindOptions({
-            lineWidth: 3,
-            velocityScale: 1/(250*myZoom),
-            paths: 100*myZoom,
-          })
-        }else if(myZoom>=10&&myZoom<11){
-          windLayer.setWindOptions({
-            lineWidth: 3,
-            velocityScale: 1/(400*myZoom),
-            paths: 60*myZoom,
-          })
-        }else if(myZoom>=11&&myZoom<13){
-          windLayer.setWindOptions({
-            lineWidth: 3,
-            velocityScale: 1/(100*myZoom*(myZoom-4)),
-            paths: 300*10/myZoom,
-          })
-        }else if(myZoom>=13&&myZoom<16.5){
-          windLayer.setWindOptions({
-            lineWidth: 3,
-            velocityScale: 1/(1000*myZoom*(myZoom-11.5)),
-            paths: 300*10/myZoom,
-          })
-        }else if(myZoom>=16.5&&myZoom<19){
-          windLayer.setWindOptions({
-            lineWidth: 3,
-            velocityScale: 1/(1000*myZoom*myZoom),
-            paths: 300*10/myZoom,
-          })
-        }/*else if(myZoom>=14&&myZoom<15){
-          windLayer.setWindOptions({
-            lineWidth: 3,
-            velocityScale: 1/(3000*myZoom),
-            paths: 300*10/myZoom,
-          })
-        }else if(myZoom>=15&&myZoom<16){
-          windLayer.setWindOptions({
-            lineWidth: 3,
-            velocityScale: 1/(4000*myZoom),
-            paths: 300*10/myZoom,
-          })
-        }else if(myZoom>=17&&myZoom<18){
-          windLayer.setWindOptions({
-            lineWidth: 3,
-            velocityScale: 1/(4000*myZoom),
-            paths: 300*10/myZoom,
-          })
-        }*/else{
-          windLayer.setWindOptions({
-            lineWidth: 3,
-            velocityScale: 1/(2000*myZoom),
-            paths: 280*10/myZoom,
-          })
-        }
+
+        windLayer.setWindOptions({
+          lineWidth: 3,
+          velocityScale: this.rmapsWindOpt.windOptions.velocityScale,
+          paths: this.rmapsWindOpt.windOptions.paths,
+        })
       }
-
     },
-    zoomChange(){
-      let _this=this
-      setTimeout(function()  {
+    setWindData(dLat){
+      fetch('http://172.18.142.203:3691/api/getWindJsonByTypeTimeSx?YBType=' + this.stationYbType + '&times=' + this.stationYbQbTimespan + '&YbSx=' + this.stationYbSc + '&stationlevelType=' + this.stationlevelType + '&stationlevel=' + this.stationlevel+'&dlat='+dLat)
+          //
+          .then(res => res.json())
+          .then(res => {
+            for(var i=0;i<this.map.getLayers().getLength();i++){
+              if(this.map.getLayers().item(i).get("name")==="风流场"){
+                this.clearWindCav(this.map.getLayers().removeAt (i))
+                this.map.addLayer(new WindLayer(res, this.rmapsWindOpt));
+                break
+              }
+            }
+          });
+    }
 
-        var myZoom=_this.map.getView().getZoom()
-        if(Math.abs(myZoom-_this.mapZoom)>0.005){
-          //alert(myZoom)
-          _this.updateWindStyle(myZoom)
-          _this.mapZoom=myZoom
-        }
-
-      }, 1500);
-    },
   },
   components: {
     maptool,
     mapQbTimeControl,
     mapStationTool,
     StationDetails,
+    mapShaChenQbTimeControl,
+    shachenStationDetails,
   }
 }
 </script>
@@ -1218,5 +1390,11 @@ export default {
   bottom: 12px;
 
 }
+.shaChenClick {
+  position: absolute;
+  bottom: 12px;
+
+}
+
 
 </style>

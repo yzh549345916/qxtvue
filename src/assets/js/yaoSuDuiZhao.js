@@ -132,3 +132,58 @@ function ecStrToInt(dataType) {
 export {
     ecStrToInt
 }
+
+//亚洲沙尘模式类型格式化
+function cuaceDataTypeConvert(dataType) {
+    switch (dataType) {
+        case "550nm沙尘光学厚度AOD550_DUST":
+            return "AOD550_DUST";
+        case "3小时累积干沉积DDEPO_DUST":
+            return "DDEPO_DUST";
+        case "3小时累计湿沉降WDEPO_DUST":
+            return "WDEPO_DUST";
+        case "地面沙尘通量DFLUX_DUST":
+            return "DFLUX_DUST";
+
+        case "含尘量LOAD_DUST":
+            return "LOAD_DUST";
+
+        case "地面沙尘浓度SCONC_DUST":
+            return "SCONC_DUST";
+
+        case "高空沙尘浓度CONC_DUST":
+            return "CONC_DUST";
+        default:
+            return "";
+
+    }
+}
+
+export {
+    cuaceDataTypeConvert
+}
+
+//区台沙尘模式类型格式化
+function qtShaChenDataTypeConvert(dataType) {
+    switch (dataType) {
+        case "干沉降DUSTDRY":
+            return "DUSTDRY";
+        case "起沙EDUST":
+            return "EDUST";
+        case "边界层高度PBLH":
+            return "PBLH";
+        case "地面沙尘浓度SURFACEDUST":
+            return "SURFACEDUST";
+        case "PM2.5":
+            return "PM25";
+        case "PM10":
+            return "PM10";
+        default:
+            return "";
+
+    }
+}
+
+export {
+    qtShaChenDataTypeConvert
+}

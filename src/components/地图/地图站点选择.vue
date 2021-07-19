@@ -82,7 +82,8 @@
                     @click="toggle"
                 >
                   <v-list-item-action>
-                    <v-icon :color="StationTypeValue.length > 0 ? 'primary' : ''">{{ icon }}</v-icon>
+                    <v-icon :color="StationTypeValue.length > 0 ? 'primary' : ''"></v-icon>
+<!--                    {{ icon }}-->
                   </v-list-item-action>
                   <v-list-item-content>
                     <v-list-item-title>全选</v-list-item-title>
@@ -114,7 +115,7 @@ export default {
     return {
       menu1: false,
       menu2: false,
-      hidebs: false,
+      hidebs: true,
       Admin_Code: "1501",
       Admin_CodeName: "呼和浩特市",
       AdminCodeSelect: [{

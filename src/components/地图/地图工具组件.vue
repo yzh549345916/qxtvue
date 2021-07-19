@@ -116,6 +116,38 @@
                 </v-card>
               </v-sheet>
             </v-tab-item>
+            <v-tab-item
+            >
+              <v-sheet flat>
+                <v-card>
+                  <v-list>
+                    <v-list-group
+                        v-for="item in shaChenItems"
+                        :key="item.title"
+                        v-model="item.active"
+                        :prepend-icon="item.action"
+                        @click="myshachenclisck"
+                    >
+                      <template v-slot:activator>
+                        <v-list-item-content>
+                          <v-list-item-title v-text="item.title"></v-list-item-title>
+                        </v-list-item-content>
+                      </template>
+                      <v-list-item-group v-model="shaChenSelectItem" color="primary">
+                        <v-list-item
+                            v-for="subItem in item.items"
+                            :key="subItem.title"
+                        >
+                          <v-list-item-content>
+                            <v-list-item-title v-text="subItem.title"></v-list-item-title>
+                          </v-list-item-content>
+                        </v-list-item>
+                      </v-list-item-group>
+                    </v-list-group>
+                  </v-list>
+                </v-card>
+              </v-sheet>
+            </v-tab-item>
           </v-tabs-items>
         </div>
       </v-fab-transition>
@@ -178,11 +210,30 @@ export default {
           ],
         },
       ],
+      shaChenItems: [
+        {
+          action: 'mdi-new-box',
+          active: true,
+          title: '区台沙尘模式',
+          items: [
+            {title: '干沉降DUSTDRY'}, {title: '起沙EDUST'}, {title: '边界层高度PBLH'}, {title: '地面沙尘浓度SURFACEDUST'},{title: 'PM2.5'},{title: 'PM10'},
+          ],
+        },
+        {
+          action: 'mdi-alpha-r-box',
+          title: '亚洲沙尘模式',
+          active: false,
+          items: [
+            {title: '550nm沙尘光学厚度AOD550_DUST'}, {title: '3小时累积干沉积DDEPO_DUST'}, {title: '3小时累计湿沉降WDEPO_DUST'}, {title: '地面沙尘通量DFLUX_DUST'}, {title: '含尘量LOAD_DUST'},{title: '地面沙尘浓度SCONC_DUST'},{title: '高空沙尘浓度CONC_DUST'},
+          ],
+        },
+      ],
+      shaChenSelectItem: null,
       tcmodel: 1,
       titleItem: [
         {tab: '格点预报'},
         {tab: '站点预报'},
-        {tab: '实况'},
+        {tab: '沙尘模式'},
         {tab: '雷达'},
         {tab: '云图'},
         {tab: '待定'},
@@ -197,9 +248,15 @@ export default {
         var s1 = this.gDitems;
         for (let i = 0; i < s1.length; i++) {
           if (s1[i].active) {
-            //alert(s1[i].title+'\n'+this.gdSelectItem+'\n'+this.tcmodel);
+            if (s1[i].items[this.gdSelectItem] === undefined) {
+              this.$emit('tctoolbox-change', this.tcmodel, s1[i].title, "取消");
+            } else {
+              this.$emit('tctoolbox-change', this.tcmodel, s1[i].title, s1[i].items[this.gdSelectItem].title);
+            }
           }
         }
+        this.unactiveTcChange(this.zDitems)
+        this.unactiveTcChange(this.shaChenItems)
       }
     },
     zdSelectItem() {
@@ -215,15 +272,45 @@ export default {
 
           }
         }
+        this.unactiveTcChange(this.gDitems)
+        this.unactiveTcChange(this.shaChenItems)
       }
     },
+    shaChenSelectItem(){
+      if (this.shaChenSelectItem !== null) {
+        const s1 = this.shaChenItems;
+        for (let i = 0; i < s1.length; i++) {
+          if (s1[i].active) {
+            if (s1[i].items[this.shaChenSelectItem] === undefined) {
+              this.$emit('tctoolbox-change', this.tcmodel, s1[i].title, "取消");
+            } else {
+              this.$emit('tctoolbox-change', this.tcmodel, s1[i].title, s1[i].items[this.shaChenSelectItem].title);
+            }
+
+          }
+        }
+        this.unactiveTcChange(this.gDitems)
+        this.unactiveTcChange(this.zDitems)
+      }
+    },
+
   },
   methods: {
     myclisck() {
       this.gdSelectItem = null;
     },
+    unactiveTcChange(s1){
+      for (let i = 0; i < s1.length; i++) {
+        if (s1[i].active) {
+          s1[i].active=false;
+        }
+      }
+    },
     myzdclisck() {
       this.zdSelectItem = null;
+    },
+    myshachenclisck() {
+      this.shaChenSelectItem = null;
     },
   },
 

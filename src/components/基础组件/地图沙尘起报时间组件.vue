@@ -18,12 +18,12 @@
     </v-tooltip>
     <v-fab-transition>
       <v-card style="background-color: #0f0f0f40;min-width: 32em;" v-if="!hidebs">
-        <v-row dense justify="end">
-          <v-spacer></v-spacer>
-          <v-col cols="7">
-            {{ titleText }}预报时间
+        <v-row dense align="center" justify="center">
+          <v-col align="center" justify="center" cols="11">
+            {{ titleText }}
           </v-col>
-          <v-col cols="1" offset="2">
+
+          <v-col cols="1"  >
             <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -200,6 +200,51 @@
           </v-col>
           <v-spacer></v-spacer>
         </v-row>
+        <v-row dense align="center" v-if="highBs" justify="center">
+          <v-col cols="1">
+          </v-col>
+          <v-col cols="2">
+            预报层次
+          </v-col>
+          <v-col cols="1">
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                    icon
+                    @click="lastHeight"
+                    v-bind="attrs"
+                    v-on="on"
+                >
+                  <v-icon>mdi-chevron-up-circle-outline</v-icon>
+                </v-btn>
+              </template>
+              <span>上一层次</span>
+            </v-tooltip>
+          </v-col>
+          <v-col cols="2">
+            <v-select
+                :items="heights"
+                label="高度层次"
+                v-model="heightSelectValue"
+            ></v-select>
+          </v-col>
+          <v-col cols="1">
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                    icon
+                    @click="nextHeight"
+                    v-bind="attrs"
+                    v-on="on"
+                >
+                  <v-icon>mdi-chevron-down-circle-outline</v-icon>
+                </v-btn>
+              </template>
+              <span>下一层次</span>
+            </v-tooltip>
+          </v-col>
+          <v-spacer></v-spacer>
+        </v-row>
       </v-card>
     </v-fab-transition>
 
@@ -209,19 +254,20 @@
 </template>
 
 <script>
-import {getTodayHourAndMinute} from "@/assets/js/getTodaytimeFormat";
-import {ecIntToStr} from "@/assets/js/yaoSuDuiZhao";
 export default {
   name: "地图起报时间组件",
   data: function () {
     return {
       menu1: false,
       menu2: false,
+      highBs:false,
       SCitems: [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72],
+      heights:[],
       ScSelectValue: -1,
+      heightSelectValue: -1,
       dateTime: {
-        date1: new Date().toLocaleDateString().replace(/\//g, '-'),
-        time1: getTodayHourAndMinute(),
+        date1: new Date(new Date().getTime()- 24 * 60 * 60 * 1000).toLocaleDateString().replace(/\//g, '-'),
+        time1: "20:00",
       },
       yBdateTimeStr: "",
       qbTimeSpan: 0,
@@ -237,27 +283,16 @@ export default {
   methods: {
     timCSH: function () {
       this.qbTimeSpan = (new Date((this.dateTime.date1 + " " + this.dateTime.time1 + ":00").substring(0, 19).replace(/-/g, '/'))).getTime();
-      if (this.dataType === "区台新方法") {
-        this.SCitems = [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72];
-      }else if(this.dataType === "RMAPS") {
-        var myTime=this.dateTime.time1.substring(0, 2);
-        if(myTime==="08"){
-          this.SCitems = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72];
-        }else{
-          this.SCitems = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96];
+      if (this.dataType === "亚洲沙尘模式") {
+        this.SCitems.splice(0,this.SCitems.length);
+        for(let i=3;i<=168;i+=3){
+          this.SCitems.push(i)
         }
-      }
-      else if (this.dataType === "EC") {
-        var scArr=[];
-        for(var i=0;i<=240;){
-          scArr.push(i);
-          if(i<72){
-            i+=3;
-          }else{
-            i+=6;
-          }
+      }else if(this.dataType === "区台沙尘模式") {
+        this.SCitems.splice(0,this.SCitems.length);
+        for(let i=1;i<=48;i+=1){
+          this.SCitems.push(i)
         }
-        this.SCitems = scArr;
       }
       this.ScSelectValue = this.SCitems[0];
       this.ybTimeSpan = this.qbTimeSpan + this.ScSelectValue * 60 * 60 * 1000;
@@ -281,21 +316,30 @@ export default {
       this.YbDateTimeChange();
     },
     lastTime: function () {
-      if (this.dataType === "区台新方法"||this.dataType === "RMAPS"||this.dataType === "EC") {
+      if (this.dataType === "亚洲沙尘模式") {
         this.qbTimeSpan = this.qbTimeSpan - 12 * 60 * 60 * 1000;
         var date = new Date(this.qbTimeSpan);
+        this.dateTime.date1 = date.toLocaleDateString().replace(/\//g, '-');
+        this.dateTime.time1 = date.toLocaleTimeString('chinese', {hour12: false}).slice(0, -3);
+      }else if (this.dataType === "区台沙尘模式") {
+        this.qbTimeSpan = this.qbTimeSpan - 24 * 60 * 60 * 1000;
+        date = new Date(this.qbTimeSpan);
+        if(date.getHours()!==20){
+          date.setHours(20);
+          this.qbTimeSpan=date.getTime();
+        }
         this.dateTime.date1 = date.toLocaleDateString().replace(/\//g, '-');
         this.dateTime.time1 = date.toLocaleTimeString('chinese', {hour12: false}).slice(0, -3);
       }
     },
     lastYbTime: function () {
-      if (this.dataType === "区台新方法") {
+      if (this.dataType === "亚洲沙尘模式") {
         var timespnMin = this.ybTimeSpan - 3 * 60 * 60 * 1000;
         if (timespnMin < this.qbTimeSpan + this.SCitems[0] * 60 * 60 * 1000) {
           return;
         }
         this.ybTimeSpan = timespnMin;
-      }else if (this.dataType === "RMAPS") {
+      }else if (this.dataType === "区台沙尘模式") {
         timespnMin = this.ybTimeSpan - 1 * 60 * 60 * 1000;
         if (timespnMin < this.qbTimeSpan + this.SCitems[0] * 60 * 60 * 1000) {
           return;
@@ -303,40 +347,16 @@ export default {
 
         this.ybTimeSpan = timespnMin;
       }
-      else if(this.dataType === "EC"){
-        var mysx=(this.ybTimeSpan-this.qbTimeSpan)/1000/60/60;
-        if(mysx<=72){
-          timespnMin = this.ybTimeSpan - 3 * 60 * 60 * 1000;
-        }else{
-          timespnMin = this.ybTimeSpan - 6 * 60 * 60 * 1000;
-        }
-        if (timespnMin < this.qbTimeSpan + this.SCitems[0] * 60 * 60 * 1000) {
-          return;
-        }
-        this.ybTimeSpan = timespnMin;
-      }
     },
     nextYbTime: function () {
-      if (this.dataType === "区台新方法") {
+      if (this.dataType === "亚洲沙尘模式") {
         var timespnMax = this.ybTimeSpan + 3 * 60 * 60 * 1000;
         if (timespnMax > this.qbTimeSpan + this.SCitems[this.SCitems.length - 1] * 60 * 60 * 1000) {
           return;
         }
         this.ybTimeSpan = timespnMax;
-      }else if (this.dataType === "RMAPS") {
+      }else if (this.dataType === "区台沙尘模式") {
         timespnMax = this.ybTimeSpan + 1 * 60 * 60 * 1000;
-        if (timespnMax > this.qbTimeSpan + this.SCitems[this.SCitems.length - 1] * 60 * 60 * 1000) {
-          return;
-        }
-        this.ybTimeSpan = timespnMax;
-      }
-      else if(this.dataType === "EC"){
-        var mysx=(this.ybTimeSpan-this.qbTimeSpan)/1000/60/60;
-        if(mysx<72){
-          timespnMax = this.ybTimeSpan + 3 * 60 * 60 * 1000;
-        }else{
-          timespnMax = this.ybTimeSpan + 6 * 60 * 60 * 1000;
-        }
         if (timespnMax > this.qbTimeSpan + this.SCitems[this.SCitems.length - 1] * 60 * 60 * 1000) {
           return;
         }
@@ -344,13 +364,9 @@ export default {
       }
     },
     nextTime: function () {
-      if (this.dataType === "区台新方法") {
+      if (this.dataType === "亚洲沙尘模式") {
         var datemax = new Date();
-        if (datemax.getHours() <= 13) {
-          datemax.setHours(8, 0, 0, 0)
-        } else {
-          datemax.setHours(20, 0, 0, 0)
-        }
+        datemax.setHours(8, 0, 0, 0)
         var timespnMax = datemax.getTime();
         this.qbTimeSpan = this.qbTimeSpan + 12 * 60 * 60 * 1000;
         if (this.qbTimeSpan > timespnMax) {
@@ -359,23 +375,40 @@ export default {
         var date = new Date(this.qbTimeSpan);
         this.dateTime.date1 = date.toLocaleDateString().replace(/\//g, '-');
         this.dateTime.time1 = date.toLocaleTimeString('chinese', {hour12: false}).slice(0, -3);
-      }else if (this.dataType === "RMAPS"||this.dataType === "EC") {
-        datemax = new Date();
-        if (datemax.getHours() <= 13) {
-          datemax = new Date(datemax.getTime()-24*60*60*1000);
-          datemax.setHours(20, 0, 0, 0)
-          datemax.setd
-        } else {
-          datemax.setHours(8, 0, 0, 0)
-        }
+      }else if (this.dataType === "区台沙尘模式") {
+        datemax = new Date(new Date().getTime() - 24*60*60*1000);
+        datemax.setHours(20, 0, 0, 0)
          timespnMax = datemax.getTime();
-        this.qbTimeSpan = this.qbTimeSpan + 12 * 60 * 60 * 1000;
+        this.qbTimeSpan = this.qbTimeSpan + 24 * 60 * 60 * 1000;
         if (this.qbTimeSpan > timespnMax) {
           this.qbTimeSpan = timespnMax
         }
         date = new Date(this.qbTimeSpan);
+        if(date.getHours()!==20){
+          date.setHours(20);
+          this.qbTimeSpan=date.getTime();
+        }
         this.dateTime.date1 = date.toLocaleDateString().replace(/\//g, '-');
         this.dateTime.time1 = date.toLocaleTimeString('chinese', {hour12: false}).slice(0, -3);
+      }
+    },
+    nextHeight(){
+      for(let i=0;i<this.heights.length-1;i++){
+        if(this.heights[i]===this.heightSelectValue){
+          this.heightSelectValue=this.heights[i+1];
+          break;
+        }
+      }
+      if(this.heightSelectValue===-1){
+        this.heightSelectValue=this.heights[0]
+      }
+    },
+    lastHeight(){
+      for(let i=1;i<this.heights.length;i++){
+        if(this.heights[i]===this.heightSelectValue){
+          this.heightSelectValue=this.heights[i-1];
+          break;
+        }
       }
     },
     YbDateTimeChange: function () {
@@ -385,7 +418,7 @@ export default {
       if (sVal !== this.ScSelectValue) {
         this.ScSelectValue = sVal;
       }
-      this.$emit('datetime-change', this.qbTimeSpan, this.ScSelectValue);
+      this.$emit('datetime-change', this.qbTimeSpan, this.ScSelectValue,this.highBs,this.heightSelectValue);
     },
     ScSChange: function () {
       var mySpn = this.qbTimeSpan + this.ScSelectValue * 60 * 60 * 1000;
@@ -396,56 +429,30 @@ export default {
     allowedHours: v => v >= 0 || v <= 24,
     allowedMinutes: v => v === 0,
     updateTitle(){
-      if(this.lxType==="站点预报"){
-        let ybStr="";
-        if (this.dataType === "EC"){
-          ybStr=ecIntToStr(this.ybType)
+      if(this.lxType==="沙尘模式"){
+        this.titleText=this.dataType+'-'+this.dataTypeStr;
+        if(this.highBs){
+          this.titleText+="-"+this.heightSelectValue+"hPa"
         }
-        else{
-          if(this.ybType===0){
-            ybStr="气温"
-          }else if(this.ybType===1){
-            ybStr="相对湿度"
-          }else if(this.ybType===2){
-            ybStr="降水量"
-          }else if(this.ybType===4){
-            ybStr="10米风"
-          }
-        }
-        this.titleText=this.lxType+'-'+this.dataType+'-'+ybStr+'-';
       }
     },
     updateType(){
-      if (this.dataType === "区台新方法") {
-        this.SCitems = [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72];
-      }else if(this.dataType === "RMAPS") {
-        var myTime=this.dateTime.time1.substring(0, 2);
-        if(myTime==="08"){
-          this.SCitems = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72];
-        }else{
-          this.SCitems = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96];
+      if (this.dataType === "亚洲沙尘模式") {
+        this.SCitems.splice(0,this.SCitems.length);
+        for(let i=3;i<=168;i+=3){
+          this.SCitems.push(i)
         }
-      }
-      else if (this.dataType === "EC") {
-        var scArr=[];
-        for(var i=0;i<=240;){
-          scArr.push(i);
-          if(i<72){
-            i+=3;
-          }else{
-            i+=6;
-          }
+      }else if(this.dataType === "区台沙尘模式") {
+        this.SCitems.splice(0,this.SCitems.length);
+        for(let i=1;i<=48;i+=1){
+          this.SCitems.push(i)
         }
-        this.SCitems = scArr;
-      }
-    },
-    updateQbtime(){
-      if(this.dataType === "RMAPS") {
-        var myTime=this.dateTime.time1.substring(0, 2);
-        if(myTime==="08"){
-          this.SCitems = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72];
-        }else{
-          this.SCitems = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96];
+       var date = new Date(this.qbTimeSpan);
+        if(date.getHours()!==20){
+          date.setHours(20);
+          this.qbTimeSpan=date.getTime();
+          this.dateTime.date1 = date.toLocaleDateString().replace(/\//g, '-');
+          this.dateTime.time1 = date.toLocaleTimeString('chinese', {hour12: false}).slice(0, -3);
         }
       }
     },
@@ -463,15 +470,40 @@ export default {
 
       }
 
-    }
+    },
+    updatedataTypeStr(){
+      if (this.dataType === "亚洲沙尘模式"&&this.dataTypeStr==="CONC_DUST"){
+        this.highBs=true;
+        this.heights.splice(0,this.heights.length);
+        for(let i=100;i<=1000;i+=50){
+          this.heights.push(i);
+        }
+        if(this.heights.length>9){
+          this.heightSelectValue=this.heights[8];
+        }
+        else if(this.heights.length>3){
+          this.heightSelectValue=this.heights[2];
+        }
+      }else{
+        this.highBs=false;
+      }
+    },
+    heightChange(){
+     if(this.highBs&&this.heightSelectValue>0){
+       this.$emit('datetime-change', this.qbTimeSpan, this.ScSelectValue,this.highBs,this.heightSelectValue);
+     }
+    },
   },
   watch: {
     dateTime: {
       handler() {
         this.dateTimeChange();
-        this.updateQbtime();
       },
       deep: true
+    },
+    heightSelectValue(){
+      this.updateTitle()
+      this.heightChange();
     },
     ybTimeSpan() {
       this.YbDateTimeChange();
@@ -479,7 +511,8 @@ export default {
     ScSelectValue() {
       this.ScSChange();
     },
-    ybType(){
+    dataTypeStr(){
+      this.updatedataTypeStr()
       this.updateTitle()
     },
     lxType(){
@@ -498,8 +531,8 @@ export default {
       type: String,
       required: true
     },
-    ybType: {
-      type: Number,
+    dataTypeStr: {
+      type: String,
       required: true
     },
     lxType: {
@@ -515,7 +548,7 @@ export default {
   position: absolute;
   max-width: 50%;
   max-height: 20%;
-  bottom: 5em;
+  bottom: 10em;
   left: 4em;
   z-index: 6;
 }

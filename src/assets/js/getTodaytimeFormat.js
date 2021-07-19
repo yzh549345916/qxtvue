@@ -31,6 +31,7 @@ function getTodayHourAndMinute (){
 export{
     getTodayHourAndMinute
 }
+
 function getZNWGTodayHourAndMinute (){
     var mydate = new Date();
     if(mydate.getHours()<= 16){
