@@ -1,31 +1,37 @@
 <template>
 
   <v-container>
-    <v-row justify="center" align="center">
-      <v-col cols="12" md="12">
-        <Eharts ref="chart1"></Eharts>
-      </v-col>
-    </v-row>
-    <v-row justify="center" align="center">
-      <v-col cols="12" md="12">
-        <Eharts ref="chart2"></Eharts>
-      </v-col>
-    </v-row>
-    <v-row justify="center" align="center">
-      <v-col cols="12" md="12">
-        <Eharts ref="chart3"></Eharts>
-      </v-col>
-    </v-row>
-    <v-row justify="center" align="center">
-      <v-col cols="12" md="12">
-        <Eharts ref="chart4"></Eharts>
-      </v-col>
-    </v-row>
-    <v-row justify="center" align="center">
-      <v-col cols="12" md="12">
-        <Eharts ref="chart5"></Eharts>
-      </v-col>
-    </v-row>
+    <div>
+      <v-btn @click="cs">测试</v-btn>
+    </div>
+    <div class="char" id="char" ref="char" style="background-color: #0f0f0f">
+      <v-row justify="center" align="center">
+        <v-col cols="12" md="12">
+          <Eharts ref="chart1"></Eharts>
+        </v-col>
+      </v-row>
+      <v-row justify="center" align="center">
+        <v-col cols="12" md="12">
+          <Eharts ref="chart2"></Eharts>
+        </v-col>
+      </v-row>
+      <v-row justify="center" align="center">
+        <v-col cols="12" md="12">
+          <Eharts ref="chart3"></Eharts>
+        </v-col>
+      </v-row>
+      <v-row justify="center" align="center">
+        <v-col cols="12" md="12">
+          <Eharts ref="chart4"></Eharts>
+        </v-col>
+      </v-row>
+      <v-row justify="center" align="center">
+        <v-col cols="12" md="12">
+          <Eharts ref="chart5"></Eharts>
+        </v-col>
+      </v-row>
+    </div>
+
   </v-container>
 </template>
 
@@ -33,6 +39,7 @@
 
 import Eharts from '@/components/数值预报查询/Echarts基组件'
 import * as echarts from 'echarts'
+import html2canvas from "html2canvas"
 var directionMap = {};
 function renderArrow(param, api) {
   var arrowSize = 21;
@@ -569,6 +576,45 @@ export default {
             console.log(err);
           });
     },
+    dataURLToBlob(dataurl) {
+      let arr = dataurl.split(',');
+      let mime = arr[0].match(/:(.*?);/)[1];
+      let bstr = atob(arr[1]);
+      let n = bstr.length;
+      let u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      return new Blob([u8arr], { type: mime });
+    },
+    cs(){
+      this.saveImage('char', '测试');
+    },
+    /*保存图片的方法（即按钮点击触发的方法）
+      第一个参数为需要保存的div的id名
+      第二个参数为保存图片的名称 */
+    saveImage(divText, imgText) {
+      let canvasID = this.$refs[divText];
+      let that = this;
+      let a = document.createElement('a');
+      html2canvas(canvasID).then(canvas => {
+        let dom = document.body.appendChild(canvas);
+        dom.style.display = 'none';
+        a.style.display = 'none';
+        document.body.removeChild(dom);
+        let blob = that.dataURLToBlob(dom.toDataURL('image/png'));
+        a.setAttribute('href', URL.createObjectURL(blob));
+        //这块是保存图片操作  可以设置保存的图片的信息
+        a.setAttribute('download', imgText + '.png');
+        document.body.appendChild(a);
+        a.click();
+        URL.revokeObjectURL(blob);
+        document.body.removeChild(a);
+      });
+    },
+
+
+
   },
   mounted() {
     this.$refs.chart1.setOption(option1);

@@ -227,6 +227,14 @@ export default {
             {title: '550nm沙尘光学厚度AOD550_DUST'}, {title: '3小时累积干沉积DDEPO_DUST'}, {title: '3小时累计湿沉降WDEPO_DUST'}, {title: '地面沙尘通量DFLUX_DUST'}, {title: '含尘量LOAD_DUST'},{title: '地面沙尘浓度SCONC_DUST'},{title: '高空沙尘浓度CONC_DUST'},
           ],
         },
+        {
+          action: 'mdi-alpha-r-box',
+          title: '京津冀华北区域模式',
+          active: false,
+          items: [
+            {title: 'AQI'}, {title: 'PM2.5'}, {title: 'PM10'}, {title: '边界层高度PBLH'}, {title: '臭氧O3'},{title: '一氧化碳CO'},{title: '二氧化氮NO2'},{title: '二氧化硫SO2'},{title: '能见度'},
+          ],
+        },
       ],
       shaChenSelectItem: null,
       tcmodel: 1,

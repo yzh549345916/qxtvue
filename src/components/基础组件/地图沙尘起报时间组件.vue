@@ -260,7 +260,6 @@ export default {
     return {
       menu1: false,
       menu2: false,
-      highBs:false,
       SCitems: [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72],
       heights:[],
       ScSelectValue: -1,
@@ -288,10 +287,34 @@ export default {
         for(let i=3;i<=168;i+=3){
           this.SCitems.push(i)
         }
+        if(this.highBs){
+          this.heights.splice(0,this.heights.length);
+          for(let i=100;i<=1000;i+=50){
+            this.heights.push(i);
+          }
+          if(this.heights.length>9){
+            this.heightSelectValue=this.heights[8];
+          }
+          else if(this.heights.length>3){
+            this.heightSelectValue=this.heights[2];
+          }
+        }
       }else if(this.dataType === "区台沙尘模式") {
         this.SCitems.splice(0,this.SCitems.length);
         for(let i=1;i<=48;i+=1){
           this.SCitems.push(i)
+        }
+      }
+      else if(this.dataType === "京津冀") {
+        this.SCitems.splice(0,this.SCitems.length);
+        if(this.dataTypeStr==="aqi"){
+          for(let i=24;i<=96;i+=24){
+            this.SCitems.push(i)
+          }
+        }else{
+          for(let i=0;i<=96;i+=1){
+            this.SCitems.push(i)
+          }
         }
       }
       this.ScSelectValue = this.SCitems[0];
@@ -321,7 +344,7 @@ export default {
         var date = new Date(this.qbTimeSpan);
         this.dateTime.date1 = date.toLocaleDateString().replace(/\//g, '-');
         this.dateTime.time1 = date.toLocaleTimeString('chinese', {hour12: false}).slice(0, -3);
-      }else if (this.dataType === "区台沙尘模式") {
+      }else if (this.dataType === "区台沙尘模式"||this.dataType === "京津冀") {
         this.qbTimeSpan = this.qbTimeSpan - 24 * 60 * 60 * 1000;
         date = new Date(this.qbTimeSpan);
         if(date.getHours()!==20){
@@ -344,7 +367,20 @@ export default {
         if (timespnMin < this.qbTimeSpan + this.SCitems[0] * 60 * 60 * 1000) {
           return;
         }
-
+        this.ybTimeSpan = timespnMin;
+      }
+      else if (this.dataType== "京津冀") {
+        if(this.dataTypeStr==="aqi"){
+          timespnMin = this.ybTimeSpan - 24 * 60 * 60 * 1000;
+          if (timespnMin < this.qbTimeSpan + this.SCitems[0] * 60 * 60 * 1000) {
+            return;
+          }
+        }else{
+          timespnMin = this.ybTimeSpan - 1 * 60 * 60 * 1000;
+          if (timespnMin < this.qbTimeSpan + this.SCitems[0] * 60 * 60 * 1000) {
+            return;
+          }
+        }
         this.ybTimeSpan = timespnMin;
       }
     },
@@ -361,6 +397,21 @@ export default {
           return;
         }
         this.ybTimeSpan = timespnMax;
+      }else if (this.dataType === "京津冀") {
+        if(this.dataTypeStr==="aqi"){
+          timespnMax = this.ybTimeSpan + 24 * 60 * 60 * 1000;
+          if (timespnMax > this.qbTimeSpan + this.SCitems[this.SCitems.length - 1] * 60 * 60 * 1000) {
+            return;
+          }
+          this.ybTimeSpan = timespnMax;
+        }else{
+          timespnMax = this.ybTimeSpan + 1 * 60 * 60 * 1000;
+          if (timespnMax > this.qbTimeSpan + this.SCitems[this.SCitems.length - 1] * 60 * 60 * 1000) {
+            return;
+          }
+          this.ybTimeSpan = timespnMax;
+        }
+
       }
     },
     nextTime: function () {
@@ -375,7 +426,7 @@ export default {
         var date = new Date(this.qbTimeSpan);
         this.dateTime.date1 = date.toLocaleDateString().replace(/\//g, '-');
         this.dateTime.time1 = date.toLocaleTimeString('chinese', {hour12: false}).slice(0, -3);
-      }else if (this.dataType === "区台沙尘模式") {
+      }else if (this.dataType === "区台沙尘模式"||this.dataType === "京津冀") {
         datemax = new Date(new Date().getTime() - 24*60*60*1000);
         datemax.setHours(20, 0, 0, 0)
          timespnMax = datemax.getTime();
@@ -454,6 +505,24 @@ export default {
           this.dateTime.date1 = date.toLocaleDateString().replace(/\//g, '-');
           this.dateTime.time1 = date.toLocaleTimeString('chinese', {hour12: false}).slice(0, -3);
         }
+      }else if(this.dataType === "京津冀") {
+        this.SCitems.splice(0,this.SCitems.length);
+        if(this.dataTypeStr==="aqi"){
+          for(let i=24;i<=96;i+=24){
+            this.SCitems.push(i)
+          }
+        }else{
+          for(let i=0;i<=96;i+=1){
+            this.SCitems.push(i)
+          }
+        }
+        var date = new Date(this.qbTimeSpan);
+        if(date.getHours()!==20){
+          date.setHours(20);
+          this.qbTimeSpan=date.getTime();
+          this.dateTime.date1 = date.toLocaleDateString().replace(/\//g, '-');
+          this.dateTime.time1 = date.toLocaleTimeString('chinese', {hour12: false}).slice(0, -3);
+        }
       }
     },
     updateSCSelect(){
@@ -483,6 +552,17 @@ export default {
         }
         else if(this.heights.length>3){
           this.heightSelectValue=this.heights[2];
+        }
+      }else if(this.dataType === "京津冀") {
+        this.SCitems.splice(0,this.SCitems.length);
+        if(this.dataTypeStr==="aqi"){
+          for(let i=24;i<=96;i+=24){
+            this.SCitems.push(i)
+          }
+        }else{
+          for(let i=0;i<=96;i+=1){
+            this.SCitems.push(i)
+          }
         }
       }else{
         this.highBs=false;
@@ -537,6 +617,10 @@ export default {
     },
     lxType: {
       type: String,
+      required: true
+    },
+    highBs: {
+      type: Boolean,
       required: true
     },
   }

@@ -1,7 +1,7 @@
 
 <template>
   <div class="echarts">
-    <div style="width:100%;min-height:550px;" id="chartEl" ref="chartEl"></div>
+    <div style="width:100%;min-height:650px;" id="chartEl" ref="chartEl"></div>
   </div>
 </template>
 
@@ -15,6 +15,7 @@ export default {
     }
   },
   mounted(){
+
     this.loadEchart();
 
     function throttle(func, wait, options) {

@@ -53,6 +53,26 @@
                     v-on="on"
                     class="text-h5"
                 >
+                  模式检验
+                </v-btn>
+              </template>
+              <v-list
+                  nav
+                  dense
+              >
+                <v-list-item router-link :to="encodeURI('/MSJY/DYRH')">
+                  <v-list-item-title class="text-body-1">多元融合实况</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+            <v-menu auto :offset-y=true open-on-hover  transition="slide-y-transition" >
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                    dark
+                    v-bind="attrs"
+                    v-on="on"
+                    class="text-h5"
+                >
                   数值预报查询
                 </v-btn>
               </template>
@@ -60,9 +80,6 @@
                   nav
                   dense
               >
-               <!-- <v-list-item link to="/数值预报查询/Chart1">
-                  <v-list-item-title class="text-body-1">折线图</v-list-item-title>
-                </v-list-item>-->
                 <v-list-item  router-link :to="encodeURI('/数值预报查询/数值预报图表查询')">
                   <v-list-item-title class="text-body-1">图表查询</v-list-item-title>
                 </v-list-item>

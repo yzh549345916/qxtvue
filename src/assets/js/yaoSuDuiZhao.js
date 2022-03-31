@@ -163,6 +163,7 @@ export {
     cuaceDataTypeConvert
 }
 
+
 //区台沙尘模式类型格式化
 function qtShaChenDataTypeConvert(dataType) {
     switch (dataType) {
@@ -186,4 +187,119 @@ function qtShaChenDataTypeConvert(dataType) {
 
 export {
     qtShaChenDataTypeConvert
+}
+
+//亚洲沙尘模式类型中文
+function cuaceDataTypeChineseConvert(dataType) {
+    switch (dataType) {
+        case "AOD550_DUST":
+            return "550nm沙尘光学厚度AOD550_DUST";
+        case "DDEPO_DUST":
+            return "3小时累积干沉积DDEPO_DUST";
+        case "WDEPO_DUST":
+            return "3小时累计湿沉降WDEPO_DUST";
+        case "DFLUX_DUST":
+            return "地面沙尘通量DFLUX_DUST";
+
+        case "LOAD_DUST":
+            return "含尘量LOAD_DUST";
+
+        case "SCONC_DUST":
+            return "地面沙尘浓度SCONC_DUST";
+
+        case "CONC_DUST":
+            return "高空沙尘浓度CONC_DUST";
+        default:
+            return "";
+
+    }
+}
+
+export {
+    cuaceDataTypeChineseConvert
+}
+
+//区台沙尘模式类型中文
+function qtShaChenDataTypeChineseConvert(dataType) {
+    switch (dataType) {
+        case "DUSTDRY":
+            return "干沉降DUSTDRY";
+        case "EDUST":
+            return "起沙EDUST";
+        case "PBLH":
+            return "边界层高度PBLH";
+        case "SURFACEDUST":
+            return "地面沙尘浓度SURFACEDUST";
+        case "PM2.5":
+            return "PM25";
+        case "PM10":
+            return "PM10";
+        default:
+            return "";
+
+    }
+}
+
+export {
+    qtShaChenDataTypeChineseConvert
+}
+
+//京津冀模式类型格式化
+function JingjinjiDataTypeConvert(dataType) {
+    switch (dataType) {
+        case "AQI":
+            return "aqi";
+        case "PM2.5":
+            return "pm25";
+        case "PM10":
+            return "pm10";
+        case "边界层高度PBLH":
+            return "pblh";
+        case "臭氧O3":
+            return "o3";
+        case "一氧化碳CO":
+            return "co";
+        case "二氧化氮NO2":
+            return "no2";
+        case "二氧化硫SO2":
+            return "so2";
+        case "能见度":
+            return "vis1";
+        default:
+            return "";
+
+    }
+}
+
+export {
+    JingjinjiDataTypeConvert
+}
+
+function JingjinjiDataTypeChineseConvert(dataType) {
+    switch (dataType){
+        case  "o3" :
+            return "臭氧";
+        case  "pm25" :
+            return "PM2.5";
+        case  "pm10" :
+            return "PM10";
+        case  "aqi" :
+            return "AQI";
+        case  "co" :
+            return "一氧化碳";
+        case  "pblh" :
+            return "边界层高度";
+        case  "no2" :
+            return "二氧化氮";
+        case  "so2" :
+            return "二氧化硫";
+        case  "vis1" :
+            return "能见度";
+        default:
+            return "";
+    }
+}
+
+export {
+    JingjinjiDataTypeChineseConvert
 }

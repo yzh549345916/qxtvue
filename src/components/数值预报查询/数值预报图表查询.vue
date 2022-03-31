@@ -2,7 +2,6 @@
   <v-card color="transparent" style="height: 100%;">
     <v-navigation-drawer
         dark
-        app
         absolute
         expand-on-hover
         v-model="drawer"

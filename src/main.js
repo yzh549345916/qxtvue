@@ -1,4 +1,5 @@
 import 'roboto-fontface/css/roboto/roboto-fontface.css'
+import '@mdi/font/css/materialdesignicons.css'
 import Vuetify from 'vuetify'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 //import '@/assets/js/fontawesome-pro-5.14.0/js/all.css' fontawesome图标，需要再用
@@ -167,7 +168,7 @@ const i18n = new VueI18n({
 //kendo.culture("zh-CN")
 // 设置反向代理，前端请求默认发送到http://localhost:3691/api  http://172.18.142.203:3691/api
 var axios = require('axios')
-axios.defaults.baseURL = 'http://localhost:3691/api'
+axios.defaults.baseURL = 'http://172.18.142.203:3691/api'
 // 全局注册，之后可在其他组件中通过 this.$axios 发送数据
 Vue.prototype.$axios = axios
 

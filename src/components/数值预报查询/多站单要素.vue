@@ -134,7 +134,7 @@ export default {
   data: function () {
     return {
       AdminCodeSelect: [{"name":"呼和浩特市","id":"1501","children":[{"name":"新城区","id":"150102","children":[],"hasChildren":true},{"name":"回民区","id":"150103","children":[],"hasChildren":true},{"name":"玉泉区","id":"150104","children":[],"hasChildren":true},{"name":"赛罕区","id":"150105","children":[],"hasChildren":true},{"name":"土默特左旗","id":"150121","children":[],"hasChildren":true},{"name":"托克托县","id":"150122","children":[],"hasChildren":true},{"name":"和林格尔县","id":"150123","children":[],"hasChildren":true},{"name":"清水河县","id":"150124","children":[],"hasChildren":true},{"name":"武川县","id":"150125","children":[],"hasChildren":true}],"hasChildren":false}],
-      StationSelect: [{"name":"呼和浩特,53463","id":"53463","hasChildren":false},{"name":"呼和浩特郊区站,53466","id":"53466","hasChildren":false}],
+      StationSelect: ["53463","53466"],
       StationTypeitems:['国家站','区域站','其他站'],
       StationTypeValue:['国家站','区域站'],
       StationType:"国家站",

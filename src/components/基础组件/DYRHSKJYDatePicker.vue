@@ -1,7 +1,7 @@
 <template>
    <v-row justify="center" align="center">
     <v-col cols="6"  class="text-center ">
-      <div style="margin-top: 15px">起报日期</div>
+      <div style="margin-top: 15px">{{datePickerName}}</div>
       <v-menu
           v-model="menu1"
           :close-on-content-click="false"
@@ -13,18 +13,18 @@
       >
         <template v-slot:activator="{ on, attrs }">
           <v-text-field
-              v-model="mydate"
+              v-model="localDate"
               prepend-icon="event"
               readonly
               v-bind="attrs"
               v-on="on"
           ></v-text-field>
         </template>
-        <v-date-picker  v-model="mydate" locale="zh-cn" :first-day-of-week="0" color="primary" @input="menu1 = false"></v-date-picker>
+        <v-date-picker  v-model="localDate" locale="zh-cn" :first-day-of-week="0" color="primary" @input="menu1 = false"></v-date-picker>
       </v-menu>
     </v-col>
-    <v-col cols="6" class="text-center ">
-      <div style="margin-top: 15px">起报时次</div>
+    <v-col cols="5" class="text-center ">
+      <div style="margin-top: 15px">{{timePickerName}}</div>
       <v-menu
           ref="menu"
           v-model="menu2"
@@ -37,8 +37,7 @@
       >
         <template v-slot:activator="{ on, attrs }">
           <v-text-field
-              v-model="time"
-
+              v-model="localTime"
               prepend-icon="access_time"
               readonly
               v-bind="attrs"
@@ -47,15 +46,13 @@
         </template>
         <v-time-picker
             v-if="menu2"
-            v-model="time"
+            v-model="localTime"
             format="24hr"
             scrollable
-            min="8:00"
-            max="20:00"
             color="primary"
             :allowed-hours="allowedHours"
             :allowed-minutes="allowedMinutes"
-            @click:minute="$refs.menu.save(time)"
+            @click:minute="$refs.menu.save(localTime)"
         ></v-time-picker>
       </v-menu>
     </v-col>
@@ -63,34 +60,53 @@
 </template>
 
 <script>
-import {getZNWGTodayHourAndMinute} from "@/assets/js/getTodaytimeFormat";
 
 export default {
-  name: "日期时间组件",
+  name: "DYRHSKJYDatePicker",
   data:function (){
     return{
-      time: getZNWGTodayHourAndMinute(),
       menu1: false,
       menu2: false,
-      mydate: new Date().toISOString().substr(0, 10),
+      localDate:'',
+      localTime:'',
     }
   },
+  props: {
+    datePickerName: {
+      type: String,
+      required: true
+    },
+    timePickerName: {
+      type: String,
+      required: true
+    },
+    mydate: {
+      type: String,
+      required: true
+    },
+    time: {
+      type: String,
+      required: true
+    },
+  },
   mounted() {
+    this.localDate=this.mydate;
+    this.localTime=this.time;
     this.dateTimeChange();
   },
   methods: {
     dateTimeChange: function () {
-     var tt= (new Date((this.mydate+" "+this.time+":00").substring(0,19).replace(/-/g,'/'))).getTime();
-     this.$emit('datetime-change',tt);
+     var dateTimeStr= this.localDate+" "+this.localTime+":00";
+     this.$emit('datetime-change',dateTimeStr);
     },
-    allowedHours: v => v === 8|| v === 20,
+    allowedHours: v => v !== 8|| v !== 20,
     allowedMinutes: v => v=== 0,
   },
   watch:{
-    time(){
+    localTime(){
       this.dateTimeChange();
     },
-    mydate(){
+    localDate(){
       this.dateTimeChange();
     }
   }

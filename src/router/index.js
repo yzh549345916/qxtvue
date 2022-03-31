@@ -8,7 +8,11 @@ import 环保局 from "../components/预报服务/环保局";
 import 主页 from "../components/home/主页";
 import Login from '../components/Login';
 import myMapFirst from '../components/地图/myMapFirst';
-
+import DYRH from "../components/MSJY/DYRH";
+import StationJianYan from "../components/MSJY/DYRH/StationJianYan";
+import StationJianYanStatistics from "../components/MSJY/DYRH/StationJianYanStatistics";
+import StationJianYanChart from "../components/MSJY/DYRH/StationJianYanChart";
+import SingleStationJianYanChart from "../components/MSJY/DYRH/SingleStationJianYanChart";
 Vue.use(Router);
 
 export default new Router({
@@ -81,6 +85,51 @@ export default new Router({
                     meta: {
                         requireAuth: false
                     }
+                },
+                {
+                    path: encodeURI("/MSJY/DYRH"),
+                    name: "DYRH",
+                    component: DYRH,
+                    meta: {
+                        requireAuth: false
+                    },
+                    children: [
+                        {path: '/', redirect: encodeURI("/MSJY/DYRH/StationJianYanChart")},
+                        {
+                            path: encodeURI("/MSJY/DYRH/StationJianYan"),
+                            name: "StationJianYan",
+                            component: StationJianYan,
+                            meta: {
+                                requireAuth: false
+                            }
+                        },
+                        {
+                            path: encodeURI("/MSJY/DYRH/StationJianYanChart"),
+                            name: "StationJianYanChart",
+                            component: StationJianYanChart,
+                            meta: {
+                                requireAuth: false
+                            }
+                        },
+                        {
+                            path: encodeURI("/MSJY/DYRH/SingleStationJianYanChart"),
+                            name: "SingleStationJianYanChart",
+                            component: SingleStationJianYanChart,
+                            meta: {
+                                requireAuth: false
+                            }
+                        },
+                        {
+                            path: encodeURI("/MSJY/DYRH/StationJianYanStatistics"),
+                            name: "StationJianYanStatistics",
+                            component: StationJianYanStatistics,
+                            meta: {
+                                requireAuth: false
+                            }
+                        },
+
+
+                    ]
                 }
 
             ]

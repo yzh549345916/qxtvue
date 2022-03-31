@@ -1,59 +1,143 @@
 <template>
-  <v-card style="min-width: 500px">
-    <v-card-title>
-      <v-row dense justify="center">
-        <v-col cols="1" align-self="center">
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                  color="primary"
-                  elevation=20
-                  fab
-                  small
-                  v-bind="attrs"
-                  v-on="on"
-                  @click="copyData"
-              >
-                <v-icon class>mdi-artstation</v-icon>
-              </v-btn>
-            </template>
-            <span>复制啊</span>
-          </v-tooltip>
-        </v-col>
-        <v-spacer></v-spacer>
-        <v-col cols="6"  align-self="center">
-          <v-text-field
-              v-model="search"
-              append-icon="mdi-magnify"
-              label="搜索"
-              single-line
-              hide-details
-          ></v-text-field>
-        </v-col>
-        <v-spacer></v-spacer>
-      </v-row>
-    </v-card-title>
-    <v-data-table
-        dense
+  <div>
+    <v-card color="rgba(38,38,38,0.7)" style="min-width: 500px" v-if="!isLine">
+      <v-card-title>
+        <v-row dense justify="center">
+          <v-col cols="2" align-self="center">
+            <v-row>
+              <v-col cols="6" align-self="center">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                        color="primary"
+                        elevation=20
+                        fab
+                        small
+                        v-bind="attrs"
+                        v-on="on"
+                        @click="isLine=true"
+                    >
+                      <v-icon class>mdi-chart-areaspline</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>显示折线</span>
+                </v-tooltip>
+              </v-col>
+              <v-col cols="6" align-self="center">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                        color="primary"
+                        elevation=20
+                        fab
+                        small
+                        v-bind="attrs"
+                        v-on="on"
+                        @click="copyData"
+                    >
+                      <v-icon class>mdi-artstation</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>复制啊</span>
+                </v-tooltip>
+              </v-col>
+            </v-row>
 
-        class="tag-read"
-        :headers="headers"
-        :items="datas"
-        :search="search"
-        :loading="loadingTable"
-        loading-text="正在加载数据，请稍候"
-    ></v-data-table>
-    <v-alert type="success" dense v-model="successAlert" transition="scale-transition" dismissible>
-      成功复制数据
-    </v-alert>
-    <v-alert type="warning" dense v-model="warningAlert" transition="scale-transition" dismissible>
-      {{warningText}}
-    </v-alert>
-  </v-card>
+          </v-col>
+          <v-spacer></v-spacer>
+          <v-col cols="6"  align-self="center">
+            <v-text-field
+                v-model="search"
+                append-icon="mdi-magnify"
+                label="搜索"
+                single-line
+                hide-details
+            ></v-text-field>
+          </v-col>
+          <v-spacer></v-spacer>
+        </v-row>
+      </v-card-title>
+      <v-data-table
+          dense
+
+          class="tag-read"
+          :headers="headers"
+          :items="datas"
+          :search="search"
+          :loading="loadingTable"
+          loading-text="正在加载数据，请稍候"
+      ></v-data-table>
+      <v-alert type="success" dense v-model="successAlert" transition="scale-transition" dismissible>
+        成功复制数据
+      </v-alert>
+      <v-alert type="warning" dense v-model="warningAlert" transition="scale-transition" dismissible>
+        {{warningText}}
+      </v-alert>
+    </v-card>
+    <v-card color="rgba(38,38,38,0.7)" style="min-width: 800px" v-if="isLine">
+      <v-card-title>
+        <v-row dense justify="center">
+          <v-col cols="2" align-self="center">
+            <v-row>
+              <v-col cols="6" align-self="center">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                        color="primary"
+                        elevation=20
+                        fab
+                        small
+                        v-bind="attrs"
+                        v-on="on"
+                        @click="isLine=false"
+                    >
+                      <v-icon class>mdi-table</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>显示表格</span>
+                </v-tooltip>
+              </v-col>
+              <v-col cols="6" align-self="center">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                        color="primary"
+                        elevation=20
+                        fab
+                        small
+                        v-bind="attrs"
+                        v-on="on"
+                        @click="copyData"
+                    >
+                      <v-icon class>mdi-artstation</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>复制啊</span>
+                </v-tooltip>
+              </v-col>
+            </v-row>
+
+          </v-col>
+          <v-spacer></v-spacer>
+          <v-col cols="6"  align-self="center">
+
+          </v-col>
+          <v-spacer></v-spacer>
+        </v-row>
+      </v-card-title>
+      <scCharts :chartData="datas" :displayBs="displayBs" :ybType="ybType" :dataType="dataType" :units="units"></scCharts>
+      <v-alert type="success" dense v-model="successAlert" transition="scale-transition" dismissible>
+        成功复制数据
+      </v-alert>
+      <v-alert type="warning" dense v-model="warningAlert" transition="scale-transition" dismissible>
+        {{warningText}}
+      </v-alert>
+    </v-card>
+  </div>
 </template>
 
 <script>
-
+import scCharts from '@/components/预报服务/shaChenStaDetCharts'
 export default {
   name: "StationDetails",
   data () {
@@ -65,12 +149,13 @@ export default {
       warningText:"",
       warningAlert:false,
       loadingTable:false,
+      isLine:true,
 
     }
   },
   props: {
     dataType: {
-      type: Number,
+      type: String,
       required: true
     },
     StationID: {
@@ -85,14 +170,22 @@ export default {
       type: Number,
       required: true
     },
-    stationlevelType:{
-      type: Number,
+    heighBs:{
+      type:Boolean,
+      required: true
+    },
+    displayBs:{
+      type:Boolean,
       required: true
     },
     stationlevel:{
       type: Number,
       required: true
-    }
+    },
+    units: {
+      type: String,
+      required: true
+    },
   },
   methods: {
     copyData() {
@@ -161,28 +254,45 @@ export default {
       this.warningAlert=false;
       this.warningText="";
     },
+    detailChange(){
+      if(this.displayBs){
+        if (this.StationID !== null) {
+          this.loadingTable=true;
+          var myurl="";
+          myurl='/getDustByDateTimeStationIDIsHeighFcstlevel?YBType=' + this.ybType + '&DataTypeStr=' + this.dataType + '&StationID=' + this.StationID + '&times=' + this.stationYbQbTimespan+ '&IsHeigh=' + this.heighBs+ '&Fcstlevel=' + this.stationlevel;
+          this.$axios
+              .get(myurl)
+              .then(res => {
+                this.headers=res.data.headers;
+                this.datas=res.data.datas;
+                this.loadingTable=false;
+              })
+              .catch(err => {
+                console.log(err);
+                this.loadingTable=false;
+              });
+        }
+      }
 
+    },
   },
   mounted() {
   },
   watch: {
     StationID() {
-      if (this.StationID !== null) {
-        this.loadingTable=true;
-        var myurl="";
-        myurl='/getzdybByTypeStationsQBTime?YBType=' + this.ybType + '&DataTypeID=' + this.dataType + '&StationID=' + this.StationID + '&times=' + this.stationYbQbTimespan+ '&stationlevelType=' + this.stationlevelType+ '&stationlevel=' + this.stationlevel;
-        this.$axios
-            .get(myurl)
-            .then(res => {
-              this.headers=res.data.headers;
-              this.datas=res.data.datas;
-              this.loadingTable=false;
-            })
-            .catch(err => {
-              console.log(err);
-              this.loadingTable=false;
-            });
-      }
+      this.detailChange();
+    },
+    stationlevel() {
+      this.detailChange();
+    },
+    dataType() {
+      this.detailChange();
+    },
+    ybType() {
+      this.detailChange();
+    },
+    stationYbQbTimespan() {
+      this.detailChange();
     },
     successAlert(){
       if(this.successAlert){
@@ -200,7 +310,7 @@ export default {
     }
   },
   components: {
-
+    scCharts
   }
 
 }

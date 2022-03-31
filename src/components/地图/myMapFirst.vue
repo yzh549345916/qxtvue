@@ -7,7 +7,7 @@
                         :lx-type="lxType" v-if="stationybTimeBs" :yb-type="stationYbDataType" :data-type="stationYbType"></mapQbTimeControl>
       <mapStationTool style="transform: scale(0.85,0.85)" @stationType-change=stationTypeChange
                       @stationDQ-change=stationDQChange v-drag v-if="stationBs"></mapStationTool>
-      <mapShaChenQbTimeControl style="transform: scale(0.85,0.85)" v-drag @datetime-change='mapShaChenQbTimeControlChange'
+      <mapShaChenQbTimeControl style="transform: scale(0.85,0.85)" v-drag @datetime-change='mapShaChenQbTimeControlChange' :highBs="heighBs"
                         :lx-type="lxType" v-if="shaChenStationBs" :dataTypeStr="dataTypeStr" :data-type="stationYbType"></mapShaChenQbTimeControl>
 
     </div>
@@ -35,7 +35,7 @@
         v-show="currentCoordinateClick !==null"
     >
       <StationDetails style="transform: scale(0.85,0.85)" :stationYbQbTimespan="stationYbQbTimespan"
-                      :StationID="SelectStationID" :stationlevel="stationlevel" :stationlevelType="stationlevelType"
+                      :StationID="SelectStationID" :stationlevel="stationlevel" :stationlevelType="stationlevelType" :displayBs="currentCoordinateClick !==null"
                       :yb-type="stationYbType" :data-type="stationYbDataType"></StationDetails>
     </div>
     <!-- 点击弹窗元素 -->
@@ -44,9 +44,9 @@
         ref="shaChenClick"
         v-show="shachenCoordinateClick !==null"
     >
-      <shachenStationDetails style="transform: scale(0.85,0.85)" :stationYbQbTimespan="stationYbQbTimespan"
-                      :StationID="SelectStationID" :stationlevel="stationlevel" :stationlevelType="stationlevelType"
-                      :yb-type="stationYbType" :data-type="stationYbDataType"></shachenStationDetails>
+      <shachenStationDetails style="transform: scale(0.85,0.85)" :stationYbQbTimespan="stationYbQbTimespan" :displayBs="shachenCoordinateClick !==null"
+                      :StationID="SelectStationID" :stationlevel="stationlevel" :heighBs="heighBs" :units="SelectUnits"
+                      :yb-type="stationYbType" :data-type="dataTypeStr"></shachenStationDetails>
     </div>
   </v-sheet>
 </template>
@@ -78,7 +78,12 @@ import StationDetails from "@/components/地图/StationDetails"
 import shachenStationDetails from "@/components/地图/shachenStationDetails";
 import LayerSwitcher from "ol-layerswitcher";
 import projzh from "@/assets/js/mypro";
-import {ecStrToInt,qtShaChenDataTypeConvert,cuaceDataTypeConvert} from "@/assets/js/yaoSuDuiZhao";
+import {
+  ecStrToInt,
+  qtShaChenDataTypeConvert,
+  cuaceDataTypeConvert,
+  JingjinjiDataTypeConvert
+} from "@/assets/js/yaoSuDuiZhao";
 import { WindLayer } from 'ol-wind'
 /*import myjson from '../../assets/json/2.json'*/
 export default {
@@ -108,6 +113,7 @@ export default {
       stationybTimeBs:true,
       shaChenStationBs: false,
       SelectStationID: "",
+      SelectUnits:"",
       mapZoom:0,
       heighBs:false,
       rmapsWindOpt:{
@@ -408,7 +414,7 @@ export default {
                       // Setting combine to true causes sub-layers to be hidden
                       // in the layerswitcher, only the parent is shown
                       combine: true,
-                      visible: true,
+                      visible: false,
                       layers: [
                         new Tile({
                           source: new XYZ({
@@ -448,7 +454,7 @@ export default {
                   title: '矢量底图',
                   type: 'base',
                   combine: true,
-                  visible: false,
+                  visible: true,
                   layers: [
                     new Image({
                       title: '边界',
@@ -1133,13 +1139,13 @@ export default {
           this.closeSchaChenClickPopup();
           return;
         }
-        /*var myfetures = features[0].getProperties().features;
-        var myfeture = myfetures[0];*/
+        var myfetures = features[0].getProperties().features;
+        var myfeture = myfetures[0];
         const coordinate = event.coordinate // 获取坐标
-        /* this.SelectStationID = myfeture.get('id');
+        this.SelectStationID = myfeture.get('id');
+        this.SelectUnits=myfeture.get('ybUnit')
          this.shachenCoordinateClick = myfeture.get('id') + "&nbsp;&nbsp;" + myfeture.get('name') + "&nbsp;&nbsp;" + myfeture.get('ybvalue') + myfeture.get('ybUnit')// 保存坐标点*/
         this.overlayShachenClick.setPosition(coordinate)
-        alert(coordinate)
       }catch (error){}
     },
     // 关闭弹窗
@@ -1254,10 +1260,15 @@ export default {
         }
         if(ybType==="区台沙尘模式"){
           this.dataTypeStr=qtShaChenDataTypeConvert(dataType);
+          this.stationYbType = ybType;
         }else if(ybType==="亚洲沙尘模式"){
           this.dataTypeStr=cuaceDataTypeConvert(dataType);
+          this.stationYbType = ybType;
         }
-        this.stationYbType = ybType;
+        else if(ybType==="京津冀华北区域模式"){
+          this.dataTypeStr=JingjinjiDataTypeConvert(dataType);
+          this.stationYbType = "京津冀";
+        }
       }
       this.displayStationYb();
     },

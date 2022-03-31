@@ -1,4 +1,4 @@
-watch<template>
+<template>
    <v-row justify="center" align="center">
     <v-col cols="6"  class="text-center ">
       <div style="margin-top: 15px">预报日期</div>
