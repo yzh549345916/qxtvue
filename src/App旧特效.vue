@@ -180,7 +180,6 @@
 
 <style lang="scss">
     @import './assets/styles/variables.scss';
-    @import './assets/styles/app.scss';
 </style>
 <style>
        canvas { width: 100%; height: 100%; position: absolute; }

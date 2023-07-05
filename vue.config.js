@@ -15,8 +15,10 @@ module.exports = {
           "^/api": ""
         }
       }
-    }
+    },
+    /*https: true*/
   },
+
   "css": {
     "extract": false,
     "sourceMap": false

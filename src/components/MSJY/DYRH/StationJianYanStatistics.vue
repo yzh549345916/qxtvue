@@ -108,8 +108,6 @@
 <script>
 import DYRHSKJYDatePicker from  '@/components/基础组件/DYRHSKJYDatePicker'
 import Clipboard from "clipboard";
-import {saveAs} from 'file-saver';
-import moment from "moment";
 import GongShi from '@/components/MSJY/DYRH/GongShi'
 export default {
   name: "StationJianYan",

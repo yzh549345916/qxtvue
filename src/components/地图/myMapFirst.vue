@@ -414,7 +414,7 @@ export default {
                       // Setting combine to true causes sub-layers to be hidden
                       // in the layerswitcher, only the parent is shown
                       combine: true,
-                      visible: false,
+                      visible: true,
                       layers: [
                         new Tile({
                           source: new XYZ({
@@ -454,7 +454,7 @@ export default {
                   title: '矢量底图',
                   type: 'base',
                   combine: true,
-                  visible: true,
+                  visible: false,
                   layers: [
                     new Image({
                       title: '边界',
@@ -539,7 +539,7 @@ export default {
               layers: [
                 new Image({
                   title: '边界',
-                  visible: false,
+                  visible: true,
                   opacity: 0.5,
                   source: new ImageWMS({
                     url: "http://172.18.142.202:8880/geoserver/yzhGeoserver/wms",
@@ -1159,11 +1159,13 @@ export default {
       // 把弹窗位置设置为undefined，并清空坐标数据
       this.overlayClick.setPosition(undefined)
       this.currentCoordinateClick = null
+      this.shachenCoordinateClick = null
     },
     closeSchaChenClickPopup() {
       // 把弹窗位置设置为undefined，并清空坐标数据
       this.overlayShachenClick.setPosition(undefined)
       this.shachenCoordinateClick = null
+      this.currentCoordinateClick = null
     },
 
     mapQbTimeControlChange: function (qbTimeSpan, ScSelectValue) {

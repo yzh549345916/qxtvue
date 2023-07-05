@@ -11,6 +11,7 @@ import myMapFirst from '../components/地图/myMapFirst';
 import DYRH from "../components/MSJY/DYRH";
 import StationJianYan from "../components/MSJY/DYRH/StationJianYan";
 import StationJianYanStatistics from "../components/MSJY/DYRH/StationJianYanStatistics";
+import DYRHPreMicaps from "../components/MSJY/DYRH/DYRHPreMicaps";
 import StationJianYanChart from "../components/MSJY/DYRH/StationJianYanChart";
 import SingleStationJianYanChart from "../components/MSJY/DYRH/SingleStationJianYanChart";
 Vue.use(Router);
@@ -127,8 +128,14 @@ export default new Router({
                                 requireAuth: false
                             }
                         },
-
-
+                        {
+                            path: encodeURI("/MSJY/DYRH/DYRHPreMicaps"),
+                            name: "DYRHPreMicaps",
+                            component: DYRHPreMicaps,
+                            meta: {
+                                requireAuth: false
+                            }
+                        },
                     ]
                 }
 

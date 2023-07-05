@@ -11,6 +11,12 @@
           nav
           dense
       >
+        <v-list-item router-link :to="encodeURI('/MSJY/DYRH/DYRHPreMicaps')">
+          <v-list-item-icon>
+            <v-icon>mdi-weather-rainy</v-icon>
+          </v-list-item-icon>
+          <v-list-item-title>多元融合实况降水查询</v-list-item-title>
+        </v-list-item>
         <v-list-item router-link :to="encodeURI('/MSJY/DYRH/StationJianYanChart')">
           <v-list-item-icon>
             <v-icon>mdi-chart-areaspline</v-icon>
